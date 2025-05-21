@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cayo Sulivam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        
+        .skill-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 3px solid #8b5cf6;
+        }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+
+        .certification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .certification-card {
+            transition: all 0.3s ease;
+        }
+
+        .certification-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Mobile Menu Styles */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 40;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #4b5563;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu a:hover {
+            background: #f9fafb;
+            color: #3b82f6;
+        }
+        .pdf-link {
+            cursor: pointer;
+            color: #f9fafb;
+            background-color: #a27ff3;
+                     
+        }
+        
+        .pdf-link:hover {
+            color: #f9fafb;
+            background-color: #8b5cf6;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .modal-body {
+            padding: 0;
+            height: calc(90vh - 120px);
+        }
+        
+        .pdf-container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .pdf-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .modal-footer {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        
+        .modal-footer button {
+            background-color: #6b7280;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .modal-footer button:hover {
+            background-color: #4b5563;
+        }
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 1.5cm;
+            }
+            
+            body {
+                font-size: 12pt;
+                line-height: 1.5;
+                color: #000;
+                background: none !important;
+            }
+            
+            /* Hide elements not needed in print */
+            header, footer, #backToTop, .mobile-menu-button, .mobile-menu {
+                display: none !important;
+            }
+            
+            /* Adjust sections for print */
+            section {
+                page-break-inside: avoid;
+                margin-bottom: 2cm;
+                padding: 0 !important;
+            }
+            
+            /* Remove background colors and images */
+            .gradient-bg {
+                background: none !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            /* Ensure text is readable */
+            h1, h2, h3, h4, h5, h6 {
+                color: #000 !important;
+            }
+            
+            /* Adjust skill bars for print */
+            .skill-bar {
+                border: 1px solid #000;
+            }
+            
+            .skill-progress {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            /* Remove hover effects */
+            .project-card:hover, .certification-card:hover {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            
+            /* Ensure links are readable */
+            a {
+                color: #000 !important;
+                text-decoration: underline;
+            }
+            
+            /* Remove unnecessary spacing */
+            .container {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            
+            /* Adjust images for print */
+            img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            /* Force page breaks between major sections */
+            section:not(:first-child) {
+                page-break-before: always;
+            }
+            
+            /* Ensure background colors print properly */
+            .bg-white, .bg-gray-50, .bg-gray-100 {
+                background-color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            /* Adjust contact form for print */
+            #contact form {
+                display: none;
+            }
+            
+            /* Show URLs after links */
+            a[href^="http"]:after {
+                content: " (" attr(href) ")";
+                font-size: 0.8em;
+                font-weight: normal;
+            }
+            
+            /* Hide decorative elements */
+            .section-title::after, .nav-link::after, .timeline-item::before {
+                display: none;
+            }
+        }
+            /* Animações CSS */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    @keyframes floatReverse {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(10px);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+    
+    .animate-fade-in-down {
+        animation: fadeInDown 1s ease-out forwards;
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 1s ease-out forwards;
+    }
+    
+    .animate-fade-in-right {
+        animation: fadeInRight 1s ease-out forwards;
+    }
+    
+    .animate-float {
+        animation: float 4s ease-in-out infinite;
+    }
+    
+    .animate-float-reverse {
+        animation: floatReverse 4s ease-in-out infinite;
+    }
+    
+    .animate-pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    .animate-delay-100 {
+        animation-delay: 0.1s;
+    }
+    
+    .animate-delay-200 {
+        animation-delay: 0.2s;
+    }
+    
+    .animate-delay-300 {
+        animation-delay: 0.3s;
+    }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header/Navigation -->
+    <header class="fixed w-full bg-white shadow-sm z-50">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="#" class="text-2xl font-bold text-blue-600">Cayo Sulivam</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="nav-link">Início</a>
+                    <a href="#about" class="nav-link">Sobre</a>
+                    <a href="#certifications" class="nav-link">Certificações</a>
+                    <a href="#skills" class="nav-link">Habilidades</a>
+                    <a href="#projects" class="nav-link">Projetos</a>
+                    <a href="#contact" class="nav-link">Contato</a>
+                </div>
+                <button id="mobileMenuButton" class="md:hidden focus:outline-none">
+                    <i class="fas fa-bars text-2xl text-blue-600"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="mobile-menu">
+            <a href="#home" class="nav-link">Início</a>
+            <a href="#about" class="nav-link">Sobre</a>
+            <a href="#certifications" class="nav-link">Certificações</a>
+            <a href="#skills" class="nav-link">Habilidades</a>
+            <a href="#projects" class="nav-link">Projetos</a>
+            <a href="#contact" class="nav-link">Contato</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="pt-32 pb-20 px-6 gradient-bg text-white overflow-hidden">
+        <div class="container mx-auto flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 animate-fade-in-down">Olá, eu sou <span class="text-yellow-300 animate-pulse">Cayo Sulivam Alves da Rocha</span></h1>
+                <h2 class="text-2xl md:text-3xl font-semibold mb-6 animate-fade-in-down animate-delay-100">Engenheiro de Produção e Software</h2>
+                <p class="text-lg mb-8 opacity-90 animate-fade-in-down animate-delay-200">Combinando eficiência industrial com inovação tecnológica para criar soluções inteligentes e escaláveis.</p>
+                <div class="flex space-x-4 animate-fade-in-up animate-delay-300">
+                    <a href="#contact" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition duration-300 transform hover:scale-105">Contate-me</a>
+                    <a href="#projects" class="border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-blue-600 transition duration-300 transform hover:scale-105">Projetos</a>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <div class="relative">
+                    <div class="w-64 h-64 md:w-80 md:h-80 bg-blue-400 rounded-full opacity-20 absolute -top-6 -left-6 animate-float"></div>
+                    <div class="w-64 h-64 md:w-80 md:h-80 bg-purple-400 rounded-full opacity-20 absolute -bottom-6 -right-6 animate-float-reverse animate-delay-200"></div>
+                    <img src="./eu.jpeg" 
+                    alt="Profile" 
+                    class="relative z-10 w-64 h-64 md:w-80 md:h-80 object-cover rounded-full border-4 border-white shadow-xl animate-fade-in-right">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-6 bg-white">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-16">
+                <span class="section-title">Sobre Mim</span>
+            </h2>
+                                    
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/3 mb-10 md:mb-0 flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                          alt="Engineering"
+                          class="w-full max-w-md rounded-lg shadow-lg">
+                </div>
+                <div class="md:w-2/3 md:pl-12">
+                    <h3 class="text-2xl font-semibold mb-4">Engenheiro de Produção e Desenvolvedor de Software</h3>
+                    <p class="text-gray-600 mb-6">
+                        Profissional com dupla formação em Engenharia de Produção e Engenharia de Software,
+                        especializado em desenvolver soluções tecnológicas que otimizam processos industriais
+                        e melhoram a eficiência operacional. Minha abordagem combina conhecimentos técnicos
+                        avançados avec visão estratégica para entregar resultados significativos.
+                    </p>
+                                                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="flex items-start">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-industry text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Engenharia de Produção</h4>
+                                <p class="text-gray-600 text-sm">Otimização de processos, gestão da qualidade e melhoria contínua</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-purple-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-laptop-code text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Engenharia de Software</h4>
+                                <p class="text-gray-600 text-sm">Desenvolvimento de sistemas robustos e soluções tecnológicas</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-project-diagram text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Gestão de Projetos</h4>
+                                <p class="text-gray-600 text-sm">Metodologias ágeis e tradicionais</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-purple-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-chart-line text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Análise de Dados</h4>
+                                <p class="text-gray-600 text-sm">Tomada de decisão baseada em dados</p>
+                            </div>
+                        </div>
+                    </div>
+                                                    
+                    <div class="flex flex-wrap gap-4">
+                        <div class="bg-gray-100 px-4 py-2 rounded-full flex items-center">
+                            <i class="fas fa-graduation-cap text-blue-600 mr-2"></i>
+                            <span>Engenharia de Produção</span>
+                        </div>
+                        <div class="bg-gray-100 px-4 py-2 rounded-full flex items-center">
+                            <i class="fas fa-laptop-code text-purple-600 mr-2"></i>
+                            <span>Engenharia de Software</span>
+                        </div>
+                        <div class="bg-gray-100 px-4 py-2 rounded-full flex items-center">
+                            <i class="fas fa-certificate text-blue-600 mr-2"></i>
+                            <span>Certificações Profissionais</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications Section -->
+    <section id="certifications" class="py-20 px-6 bg-gray-50">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-16">
+                <span class="section-title">Minhas Certificações</span>
+            </h2>
+                                    
+            <div class="max-w-4xl mx-auto relative">
+                <!-- Timeline -->
+                <div class="border-l-2 border-blue-200 pl-8 md:pl-12 space-y-12">
+                    <!-- Engenharia de Produção -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-md transition duration-300 hover:shadow-lg">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-industry text-blue-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">Bacharelado em Engenharia de Produção</h3>
+                                    <p class="text-gray-500">Centro Universitário Filadélfia - Cursando</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Formação completa em Engenharia de Produção com ênfase em gestão de processos e otimização
+                                de sistemas produtivos. Domínio de ferramentas como Lean Manufacturing, Seis Sigma,
+                                gestão da cadeia de suprimentos e controle estatístico de processos.
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Gestão de Processos</span>
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Logística</span>
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Qualidade</span>
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Produtividade</span>
+                                <span class="pdf-link px-3 py-1 rounded-full text-sm" data-pdf-url="https://docs.google.com/spreadsheets/d/1w4Cb1DXTt6WlUL_orsnWSGuZZ99lOGO5F5XY4QjOTuo/edit?usp=drive_link">Certificado</span>
+                            </div>
+                        </div>
+                    </div>
+                                                    
+                    <!-- Engenharia de Software -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-md transition duration-300 hover:shadow-lg">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-purple-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-laptop-code text-purple-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">Bacharelado em Engenharia de Software</h3>
+                                    <p class="text-gray-500">Centro Universitário Filadélfia - Cursando</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Formação em Engenharia de Software com especialização em desenvolvimento de sistemas
+                                complexos, arquitetura de software e metodologias ágeis. Experiência prática com diversas
+                                linguagens de programação, frameworks modernos e boas práticas de desenvolvimento.
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Desenvolvimento</span>
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Arquitetura</span>
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Banco de Dados</span>
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">DevOps</span>
+                                <span class="pdf-link px-3 py-1 rounded-full text-sm" data-pdf-url="https://drive.google.com/file/d/1tqeyqz75FsvpshmC35CfF2PfrZ6Wyj3g/preview">Certificado</span>
+                            </div>
+                        </div>
+                    </div>
+                                                    
+                    <!-- Certificação Adicional -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-md transition duration-300 hover:shadow-lg">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-green-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-certificate text-green-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">Certificação em Gestão Ágil</h3>
+                                    <p class="text-gray-500">Scrum Alliance - Concluído em 2023</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Certificação profissional em metodologias ágeis com foco em Scrum. Capacitação para atuar
+                                como Scrum Master em projetos de desenvolvimento de software e melhoria de processos,
+                                aplicando práticas ágeis para aumentar a eficiência e qualidade dos entregáveis.
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Scrum</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Kanban</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Gestão de Projetos</span>
+                                <span class="pdf-link px-3 py-1 rounded-full text-sm" data-pdf-url="https://drive.google.com/file/d/1tqeyqz75FsvpshmC35CfF2PfrZ6Wyj3g/preview">Certificado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certificações Adicionais em Grid -->
+            <div class="mt-16">
+                <h3 class="text-2xl font-semibold mb-8 text-center">Outras Certificações</h3>
+                                
+                <div class="certification-grid">
+                    <!-- Auxiliar Administrativo -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-file-alt text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold">Administração</h3>
+                                <p class="text-gray-500 text-sm">Microlins - 2016</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            Certificação em rotinas administrativas, organização de documentos, atendimento ao cliente e
+                            noções básicas de contabilidade e departamento pessoal.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Atendimento</span>
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Organização</span>
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Processos</span>
+                        </div>
+                    </div>
+                                        
+                    <!-- Pacote Office Avançado -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-purple-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-file-excel text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold">Pacote Office Avançado</h3>
+                                <p class="text-gray-500 text-sm">Microlins - 2018</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            Domínio avançado do Microsoft Office (Word, Excel, PowerPoint, Access) com foco em
+                            automação de tarefas, fórmulas complexas, macros e criação de relatórios profissionais.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Excel</span>
+                            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">VBA</span>
+                            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Relatórios</span>
+                        </div>
+                    </div>
+                                        
+                    <!-- Power BI -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-chart-pie text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold">Power BI</h3>
+                                <p class="text-gray-500 text-sm">Udemy - 2022</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            Certificação em Power BI para análise e visualização de dados, criação of dashboards
+                            interativos, DAX, Power Query e integração com diversas fontes de dados.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Dashboard</span>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">DAX</span>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">BI</span>
+                        </div>
+                    </div>
+                                        
+                    <!-- Ruby on Rails -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-red-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-gem text-red-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold">Ruby on Rails</h3>
+                                <p class="text-gray-500 text-sm">Udemy - 2023</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            Desenvolvimento web com Ruby on Rails, incluindo MVC, ActiveRecord, APIs RESTful,
+                            autenticação, testes e deploy em produção seguindo as melhores práticas.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Ruby</span>
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Rails</span>
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Web</span>
+                        </div>
+                    </div>
+                                        
+                    <!-- Kotlin -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-mobile-alt text-indigo-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold">Kotlin</h3>
+                                <p class="text-gray-500 text-sm">Unifil - 2024</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            Desenvolvimento Android com Kotlin, incluindo componentes Android, corrotinas,
+                            Jetpack Compose, injeção de dependência e integração com APIs REST.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-xs">Android</span>
+                            <span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-xs">Mobile</span>
+                            <span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-xs">Kotlin</span>
+                        </div>
+                    </div>
+                                        
+                    <!-- Vue.js -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-teal-100 p-3 rounded-full mr-4">
+                                <i class="fab fa-vuejs text-teal-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold">Vue.js</h3>
+                                <p class="text-gray-500 text-sm">Udemy - 2024</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            Desenvolvimento front-end com Vue.js, incluindo Vuex, Vue Router, Composition API,
+                            testes e integração com back-end através de APIs REST/GraphQL.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-teal-100 text-teal-800 px-2 py-1 rounded-full text-xs">Vue</span>
+                            <span class="bg-teal-100 text-teal-800 px-2 py-1 rounded-full text-xs">Frontend</span>
+                            <span class="bg-teal-100 text-teal-800 px-2 py-1 rounded-full text-xs">JavaScript</span>
+                        </div>
+                    </div>
+                    <!-- JavaScript -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                          <div class="bg-blue-100 p-3 rounded-full mr-4">
+                            <i class="fab fa-js text-blue-600 text-xl"></i>
+                          </div>
+                          <div>
+                            <h3 class="text-lg font-bold">JavaScript</h3>
+                            <p class="text-gray-500 text-sm">Udemy - 2023</p>
+                          </div>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm">
+                          Desenvolvimento front-end com JavaScript moderno (ES6+), incluindo manipulação do DOM,
+                          programação assíncrona, consumo de APIs REST/GraphQL e conceitos avançados da linguagem.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                          <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">JavaScript</span>
+                          <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">ES6+</span>
+                          <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Frontend</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Python -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                        <div class="bg-green-100 p-3 rounded-full mr-4">
+                            <i class="fab fa-python text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">Python</h3>
+                            <p class="text-gray-500 text-sm">Udemy - 2023</p>
+                        </div>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm">
+                        Desenvolvimento back-end com Python, incluindo frameworks como Django e Flask,
+                        manipulação de dados com Pandas/NumPy, automação de tarefas e desenvolvimento
+                        de scripts eficientes para diversas aplicações.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Python</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Backend</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Data Science</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 1 -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                      <div class="flex items-center mb-4">
+                        <div class="bg-blue-100 p-3 rounded-full mr-4">
+                          <i class="fas fa-cogs text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                          <h3 class="text-lg font-bold">Gestão de Processos</h3>
+                          <p class="text-gray-500 text-sm">UNIFIL - 2024</p>
+                        </div>
+                      </div>
+                      <p class="text-gray-600 mb-4 text-sm">
+                        Metodologias para mapeamento, análise e melhoria de processos produtivos, incluindo ferramentas como BPMN, fluxogramas e indicadores de desempenho.
+                      </p>
+                      <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">BPM</span>
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Lean</span>
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Six Sigma</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Card 2 -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                      <div class="flex items-center mb-4">
+                        <div class="bg-green-100 p-3 rounded-full mr-4">
+                          <i class="fas fa-chart-line text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                          <h3 class="text-lg font-bold">Logística Integrada</h3>
+                          <p class="text-gray-500 text-sm">UNIFIL - 2023</p>
+                        </div>
+                      </div>
+                      <p class="text-gray-600 mb-4 text-sm">
+                        Gestão da cadeia de suprimentos, transporte, armazenagem e distribuição, com enfoque em redução de custos e aumento da eficiência operacional.
+                      </p>
+                      <div class="flex flex-wrap gap-2">
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">SCM</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Transportes</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Armazenagem</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Card 3 -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                      <div class="flex items-center mb-4">
+                        <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                          <i class="fas fa-industry text-yellow-600 text-xl"></i>
+                        </div>
+                        <div>
+                          <h3 class="text-lg font-bold">Gestão da Qualidade</h3>
+                          <p class="text-gray-500 text-sm">UNIFIL - 2022</p>
+                        </div>
+                      </div>
+                      <p class="text-gray-600 mb-4 text-sm">
+                        Implementação de sistemas de gestão da qualidade (ISO 9001), ferramentas estatísticas de controle e metodologias para garantia da qualidade em processos industriais.
+                      </p>
+                      <div class="flex flex-wrap gap-2">
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">ISO 9001</span>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Controle Estatístico</span>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">PDCA</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Card 4 -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                      <div class="flex items-center mb-4">
+                        <div class="bg-red-100 p-3 rounded-full mr-4">
+                          <i class="fas fa-robot text-red-600 text-xl"></i>
+                        </div>
+                        <div>
+                          <h3 class="text-lg font-bold">Automação Industrial</h3>
+                          <p class="text-gray-500 text-sm">UNIFIL - 2024</p>
+                        </div>
+                      </div>
+                      <p class="text-gray-600 mb-4 text-sm">
+                        Princípios de automação de processos industriais, incluindo CLPs, sensores, atuadores e sistemas de controle avançados para manufatura inteligente.
+                      </p>
+                      <div class="flex flex-wrap gap-2">
+                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">CLP</span>
+                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Indústria 4.0</span>
+                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">IoT</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Card 5 -->
+                    <div class="certification-card bg-white p-6 rounded-lg shadow-md">
+                      <div class="flex items-center mb-4">
+                        <div class="bg-purple-100 p-3 rounded-full mr-4">
+                          <i class="fas fa-project-diagram text-purple-600 text-xl"></i>
+                        </div>
+                        <div>
+                          <h3 class="text-lg font-bold">Gestão de Projetos</h3>
+                          <p class="text-gray-500 text-sm">UNIFIL - 2023</p>
+                        </div>
+                      </div>
+                      <p class="text-gray-600 mb-4 text-sm">
+                        Metodologias ágeis e tradicionais de gestão de projetos, com aplicação de ferramentas como PMBOK, Scrum e Kanban em contextos industriais.
+                      </p>
+                      <div class="flex flex-wrap gap-2">
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">PMBOK</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Scrum</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Kanban</span>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 px-6 bg-white">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-16">
+                <span class="section-title">Minhas Habilidades</span>
+            </h2>
+                                    
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Technical Skills -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-code mr-3 text-blue-600"></i>
+                        Linguagens
+                    </h3>
+                                                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Ruby</span>
+                                <span>98%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 98%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Python</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 90%"></div>
+                            </div>
+                        </div>
+                                                                
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>JavaScript/TypeScript</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 85%"></div>
+                            </div>
+                        </div>
+                                                                
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>SQL & NoSQL</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 80%"></div>
+                            </div>
+                        </div>
+                                                                
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>React/Node.js</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                                
+                <!-- Engineering Skills -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-cogs mr-3 text-purple-600"></i>
+                        Engenharia de Produção
+                    </h3>
+                                                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Otimização de Processos</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 95%"></div>
+                            </div>
+                        </div>
+                                                                
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Gestão da Qualidade</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 90%"></div>
+                            </div>
+                        </div>
+                                                                
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Logística e Cadeia de Suprimentos</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 85%"></div>
+                            </div>
+                        </div>
+                                                                
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Gestão de Projetos</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                      <i class="fas fa-laptop-code mr-3 text-blue-600"></i>
+                      Engenharia de Software
+                    </h3>
+                                                                
+                    <div class="space-y-6">
+                      <div>
+                        <div class="flex justify-between mb-2">
+                          <span>Desenvolvimento de Software</span>
+                          <span>95%</span>
+                        </div>
+                        <div class="skill-bar bg-gray-200 rounded-full h-2.5">
+                          <div class="skill-progress bg-blue-600 h-2.5 rounded-full" style="width: 95%"></div>
+                        </div>
+                      </div>
+                                                                            
+                      <div>
+                        <div class="flex justify-between mb-2">
+                          <span>Arquitetura de Sistemas</span>
+                          <span>90%</span>
+                        </div>
+                        <div class="skill-bar bg-gray-200 rounded-full h-2.5">
+                          <div class="skill-progress bg-blue-600 h-2.5 rounded-full" style="width: 90%"></div>
+                        </div>
+                      </div>
+                                                                            
+                      <div>
+                        <div class="flex justify-between mb-2">
+                          <span>Testes e Qualidade de Software</span>
+                          <span>85%</span>
+                        </div>
+                        <div class="skill-bar bg-gray-200 rounded-full h-2.5">
+                          <div class="skill-progress bg-blue-600 h-2.5 rounded-full" style="width: 85%"></div>
+                        </div>
+                      </div>
+                                                                            
+                      <div>
+                        <div class="flex justify-between mb-2">
+                          <span>Gestão de Projetos Ágeis</span>
+                          <span>80%</span>
+                        </div>
+                        <div class="skill-bar bg-gray-200 rounded-full h-2.5">
+                          <div class="skill-progress bg-blue-600 h-2.5 rounded-full" style="width: 80%"></div>
+                        </div>
+                      </div>
+                  
+                      <div>
+                        <div class="flex justify-between mb-2">
+                          <span>DevOps e CI/CD</span>
+                          <span>75%</span>
+                        </div>
+                        <div class="skill-bar bg-gray-200 rounded-full h-2.5">
+                          <div class="skill-progress bg-blue-600 h-2.5 rounded-full" style="width: 75%"></div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                                                
+                <!-- Soft Skills -->
+                <div class="md:col-span-2">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-brain mr-3 text-blue-600"></i>
+                        Habilidades Interpessoais
+                    </h3>
+                                                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center border border-gray-100">
+                            <div class="bg-blue-100 p-3 rounded-full mb-3">
+                                <i class="fas fa-users text-blue-600 text-xl"></i>
+                            </div>
+                            <h4 class="font-semibold text-center">Trabalho em Equipe</h4>
+                        </div>
+                                                                
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center border border-gray-100">
+                            <div class="bg-purple-100 p-3 rounded-full mb-3">
+                                <i class="fas fa-lightbulb text-purple-600 text-xl"></i>
+                            </div>
+                            <h4 class="font-semibold text-center">Resolução de Problemas</h4>
+                        </div>
+                                                                
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center border border-gray-100">
+                            <div class="bg-blue-100 p-3 rounded-full mb-3">
+                                <i class="fas fa-comments text-blue-600 text-xl"></i>
+                            </div>
+                            <h4 class="font-semibold text-center">Comunicação</h4>
+                        </div>
+                                                                
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center border border-gray-100">
+                            <div class="bg-purple-100 p-3 rounded-full mb-3">
+                                <i class="fas fa-clock text-purple-600 text-xl"></i>
+                            </div>
+                            <h4 class="font-semibold text-center">Gestão do Tempo</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 px-6 bg-gray-50">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-16">
+                <span class="section-title">Meus Projetos</span>
+            </h2>
+                                    
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project 1 -->
+                <div class="project-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Project 1" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold">Sistema de Gestão Industrial</h3>
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Engenharia</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Plataforma integrada para monitoramento e otimização de processos produtivos com análise de dados em tempo real.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">Python</span>
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">Django</span>
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">PostgreSQL</span>
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">Dash</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                                Ver detalhes
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                                <i class="fab fa-github text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                                                
+                <!-- Project 2 -->
+                <div class="project-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1555774698-0f77e70ac3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Project 2" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold">Aplicativo de Logística</h3>
+                            <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">Software</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Solução mobile para roteirização inteligente de entregas com integração a sistemas ERP e cálculo de rotas otimizadas.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">React Native</span>
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">Node.js</span>
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">MongoDB</span>
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">Google Maps API</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                                Ver detalhes
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                                <i class="fab fa-github text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                                                
+                <!-- Project 3 -->
+                <div class="project-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1415&q=80" alt="Project 3" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold">Dashboard Analytics</h3>
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Engenharia</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Ferramenta de business intelligence para análise de KPIs industriais com visualização interativa de dados.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">Power BI</span>
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">Python</span>
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">SQL</span>
+                            <span class="bg-gray-100 px-2 py-1 text-xs rounded">Azure</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                                Ver detalhes
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                                <i class="fab fa-github text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                                    
+            <div class="text-center mt-12">
+                <a href="#" class="inline-block gradient-bg text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition">
+                    Ver Todos os Projetos
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-6 bg-white">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-16">
+                <span class="section-title">Entre em Contato</span>
+            </h2>
+                                    
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+                <div class="md:flex">
+                    <div class="md:w-1/2 gradient-bg text-white p-10">
+                        <h3 class="text-2xl font-bold mb-6">Informações de Contato</h3>
+                                                                
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="bg-white bg-opacity-20 p-3 rounded-full mr-4">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Email</h4>
+                                    <p>sulivamcayo5@gmail.com</p>
+                                </div>
+                            </div>
+                                                                                    
+                            <div class="flex items-start">
+                                <div class="bg-white bg-opacity-20 p-3 rounded-full mr-4">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Telefone</h4>
+                                    <p>+55 (43) 98409-8513</p>
+                                </div>
+                            </div>
+                                                                                    
+                            <div class="flex items-start">
+                                <div class="bg-white bg-opacity-20 p-3 rounded-full mr-4">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Localização</h4>
+                                    <p>Londrina, Paraná - Brasil</p>
+                                </div>
+                            </div>
+                        </div>
+                                                                
+                        <div class="mt-10">
+                            <h4 class="font-semibold mb-4">Redes Sociais</h4>
+                            <div class="flex space-x-4">
+                                <a href="https://github.com/CayoSulivam" class="bg-white bg-opacity-20 w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-30 transition">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                
+                                <a href="https://www.instagram.com/sulivam_cayo?igsh=ZXc5cjR4em03MzJp" class="bg-white bg-opacity-20 w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-30 transition">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://wa.me/5543984098513" class="bg-white bg-opacity-20 w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-30 transition">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                                                            
+                    <div class="md:w-1/2 p-10">
+                        <form class="space-y-6">
+                            <div>
+                                <label for="name" class="block text-gray-700 font-medium mb-2">Nome</label>
+                                <input type="text" id="name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                                                                                    
+                            <div>
+                                <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+                                <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                                                                                    
+                            <div>
+                                <label for="subject" class="block text-gray-700 font-medium mb-2">Assunto</label>
+                                <input type="text" id="subject" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                                                                                    
+                            <div>
+                                <label for="message" class="block text-gray-700 font-medium mb-2">Mensagem</label>
+                                <textarea id="message" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                                                                                    
+                            <button type="submit" class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:opacity-90 transition">
+                                Enviar Mensagem
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- PDF Modal -->
+    <div id="pdfModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Certificado</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="pdf-container">
+                    <iframe id="pdfViewer" class="pdf-iframe" src=""></iframe>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="closeModal2">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="text-2xl font-bold mb-2">
+                        <span class="text-white">Cayo</span>
+                        <span class="text-blue-400">Sulivam</span>
+                    </div>
+                    <p class="text-gray-400">Engenheiro de Produção e Software</p>
+                </div>
+                                                            
+                <div class="flex space-x-6 mb-6 md:mb-0">
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-linkedin-in text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                </div>
+                                                            
+                <div class="text-gray-400 text-sm">
+                    <p>&copy; 2023 Cayo Sulivam. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition opacity-0 invisible">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+                        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+                backToTopButton.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopButton.classList.remove('opacity-100', 'visible');
+                backToTopButton.classList.add('opacity-0', 'invisible');
+            }
+        });
+                        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+                        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                                
+                // Close mobile menu if open
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu.classList.contains('active')) {
+                    mobileMenu.classList.remove('active');
+                }
+                                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+                        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+                
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+                        
+            // Change icon based on menu state
+            const icon = mobileMenuButton.querySelector('i');
+            if (mobileMenu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+                
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.contains(e.target) && e.target !== mobileMenuButton && !mobileMenuButton.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+                const icon = mobileMenuButton.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // PDF Modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const pdfModal = document.getElementById('pdfModal');
+            const pdfViewer = document.getElementById('pdfViewer');
+            const closeModalBtn = document.getElementById('closeModal');
+            const closeModalBtn2 = document.getElementById('closeModal2');
+            
+            // Get all PDF links
+            const pdfLinks = document.querySelectorAll('.pdf-link');
+            
+            // Add click event to each PDF link
+            pdfLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const pdfUrl = this.getAttribute('data-pdf-url');
+                    pdfViewer.src = pdfUrl;
+                    pdfModal.style.display = 'flex';
+                });
+            });
+            
+            // Close modal functions
+            function closeModal() {
+                pdfModal.style.display = 'none';
+                pdfViewer.src = '';
+            }
+            
+            closeModalBtn.addEventListener('click', closeModal);
+            closeModalBtn2.addEventListener('click', closeModal);
+            
+            // Close modal when clicking outside
+            pdfModal.addEventListener('click', function(e) {
+                if (e.target === pdfModal) {
+                    closeModal();
+                }
+            });
+            
+            // Close modal with ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        });
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Adiciona efeito parallax básico
+        window.addEventListener('scroll', function() {
+            const scrollPosition = window.scrollY;
+            const homeSection = document.getElementById('home');
+            
+            if (homeSection) {
+                homeSection.style.backgroundPositionY = -scrollPosition * 0.5 + 'px';
+            }
+        });
+    </script>
+</body>
+</html>
