@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MenuMaster</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="./restaurante_styles.css" />
+    </head>
+    <body class="bg-gray-100">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Login Button (Fixed on top right) -->
+            <button id="showLoginBtn" class="login-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 shadow-lg">
+                <i class="fas fa-sign-in-alt mr-2"></i>Login Admin
+            </button>
+
+            <!-- Login Section -->
+            <div id="loginSection" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Login Admin</h2>
+                    <div class="mb-4">
+                        <label for="username" class="block text-gray-700 mb-2">Usuário</label>
+                        <input type="text" id="username" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 mb-2">Senha</label>
+                        <input type="password" id="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <button id="loginBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Entrar</button>
+                    <p id="loginError" class="text-red-500 mt-4 text-center hidden">Usuário ou senha incorretos</p>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div id="mainContent">
+                <!-- Header -->
+                <header class="bg-white shadow-md rounded-lg mb-8 p-6">
+                    <h1 class="text-3xl font-bold text-gray-800 text-center">Restaurante Delícia</h1>
+                </header>
+
+                <!-- Admin Sidebar -->
+                <div id="adminSidebar" class="hidden fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-40">
+                    <div class="p-4 border-b">
+                        <h2 class="text-xl font-semibold text-gray-800">Menu Admin</h2>
+                    </div>
+                    <nav class="p-4">
+                        <ul class="space-y-2">
+                            <li>
+                                <button class="admin-menu-btn w-full text-left px-4 py-2 rounded-lg hover:bg-blue-50 transition duration-200" data-target="addDishSection">
+                                    <i class="fas fa-utensils mr-2 text-blue-500"></i>Cadastrar Prato
+                                </button>
+                            </li>
+                            <li>
+                                <button class="admin-menu-btn w-full text-left px-4 py-2 rounded-lg hover:bg-blue-50 transition duration-200" data-target="addBeverageSection">
+                                    <i class="fas fa-glass-martini-alt mr-2 text-blue-500"></i>Cadastrar Bebida
+                                </button>
+                            </li>
+                            <li>
+                                <button class="admin-menu-btn w-full text-left px-4 py-2 rounded-lg hover:bg-blue-50 transition duration-200" data-target="addDessertSection">
+                                    <i class="fas fa-ice-cream mr-2 text-blue-500"></i>Cadastrar Doce
+                                </button>
+                            </li>
+                            <li>
+                                <button class="admin-menu-btn w-full text-left px-4 py-2 rounded-lg hover:bg-blue-50 transition duration-200" data-target="catalogSection">
+                                    <i class="fas fa-book mr-2 text-blue-500"></i>Catálogo
+                                </button>
+                            </li>
+                            <li>
+                                <button class="admin-menu-btn w-full text-left px-4 py-2 rounded-lg hover:bg-blue-50 transition duration-200" data-target="ordersSection">
+                                    <i class="fas fa-clipboard-list mr-2 text-blue-500"></i>Ver Pedidos
+                                </button>
+                            </li>
+                            <li>
+                                <button class="admin-menu-btn w-full text-left px-4 py-2 rounded-lg hover:bg-blue-50 transition duration-200" data-target="finishedOrdersSection">
+                                    <i class="fas fa-check-circle mr-2 text-blue-500"></i>Pedidos Finalizados
+                                </button>
+                            </li>
+                            <li>
+                                <button class="admin-menu-btn w-full text-left px-4 py-2 rounded-lg hover:bg-blue-50 transition duration-200" data-target="statisticsSection">
+                                    <i class="fas fa-chart-bar mr-2 text-blue-500"></i>Estatísticas
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- Admin Toggle Button -->
+                <button id="adminToggleBtn" class="fixed bottom-6 left-6 bg-blue-600 text-white p-3 rounded-full shadow-lg z-30 hover:bg-blue-700 transition duration-200 hidden">
+                    <i class="fas fa-cog"></i>
+                </button>
+
+                <!-- Menu Section -->
+                <section id="menuSection" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Cardápio</h2>
+                    
+                    <!-- Menu Tabs -->
+                    <div class="mb-6">
+                        <div class="flex border-b">
+                            <button class="menu-tab-btn active px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600" data-tab="dishesTab">Pratos</button>
+                            <button class="menu-tab-btn px-4 py-2 font-medium text-gray-500 hover:text-gray-700" data-tab="beveragesTab">Bebidas</button>
+                            <button class="menu-tab-btn px-4 py-2 font-medium text-gray-500 hover:text-gray-700" data-tab="dessertsTab">Doces</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Dishes Tab -->
+                    <div id="dishesTab" class="tab-content active">
+                        <div id="dishesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Dishes will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Beverages Tab -->
+                    <div id="beveragesTab" class="tab-content">
+                        <div id="beveragesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Beverages will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Desserts Tab -->
+                    <div id="dessertsTab" class="tab-content">
+                        <div id="dessertsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Desserts will be loaded here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Admin Sections (hidden by default) -->
+                
+                <!-- Add Dish Section -->
+                <section id="addDishSection" class="tab-content bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Cadastrar Novo Prato</h2>
+                    <form id="addDishForm" class="space-y-4">
+                        <div>
+                            <label for="dishName" class="block text-gray-700 mb-2">Nome do Prato</label>
+                            <input type="text" id="dishName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="dishIngredients" class="block text-gray-700 mb-2">Ingredientes</label>
+                            <textarea id="dishIngredients" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                        </div>
+                        <div>
+                            <label for="dishPrice" class="block text-gray-700 mb-2">Valor</label>
+                            <input type="number" id="dishPrice" min="0" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="dishImage" class="block text-gray-700 mb-2">Imagem do Prato</label>
+                            <input type="file" id="dishImage" accept="image/*" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <img id="dishImagePreview" class="mt-2 rounded-lg">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Salvar</button>
+                    </form>
+                </section>
+                
+                <!-- Add Beverage Section -->
+                <section id="addBeverageSection" class="tab-content bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Cadastrar Nova Bebida</h2>
+                    <form id="addBeverageForm" class="space-y-4">
+                        <div>
+                            <label for="beverageName" class="block text-gray-700 mb-2">Nome da Bebida</label>
+                            <input type="text" id="beverageName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="beveragePrice" class="block text-gray-700 mb-2">Valor</label>
+                            <input type="number" id="beveragePrice" min="0" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="b BeverageImage" class="block text-gray-700 mb-2">Imagem da Bebida</label>
+                            <input type="file" id="beverageImage" accept="image/*" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <img id="beverageImagePreview" class="mt-2 rounded-lg">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Salvar</button>
+                    </form>
+                </section>
+                
+                <!-- Add Dessert Section -->
+                <section id="addDessertSection" class="tab-content bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Cadastrar Novo Doce</h2>
+                    <form id="addDessertForm" class="space-y-4">
+                        <div>
+                            <label for="dessertName" class="block text-gray-700 mb-2">Nome do Doce</label>
+                            <input type="text" id="dessertName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="dessertPrice" class="block text-gray-700 mb-2">Valor</label>
+                            <input type="number" id="dessertPrice" min="0" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="dessertImage" class="block text-gray-700 mb-2">Imagem do Doce</label>
+                            <input type="file" id="dessertImage" accept="image/*" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <img id="dessertImagePreview" class="mt-2 rounded-lg">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Salvar</button>
+                    </form>
+                </section>
+                
+                <!-- Catalog Section -->
+                <section id="catalogSection" class="tab-content bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Catálogo</h2>
+                    
+                    <!-- Dishes Catalog -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Pratos</h3>
+                        <div id="dishesCatalog" class="space-y-4">
+                            <!-- Dishes catalog items will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Beverages Catalog -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Bebidas</h3>
+                        <div id="beveragesCatalog" class="space-y-4">
+                            <!-- Beverages catalog items will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Desserts Catalog -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Doces</h3>
+                        <div id="dessertsCatalog" class="space-y-4">
+                            <!-- Desserts catalog items will be loaded here -->
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Orders Section -->
+                <section id="ordersSection" class="tab-content bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Pedidos</h2>
+                    <div id="ordersContainer" class="space-y-4">
+                        <!-- Orders will be loaded here -->
+                    </div>
+                </section>
+                
+                <!-- Finished Orders Section -->
+                <section id="finishedOrdersSection" class="tab-content bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Pedidos Finalizados</h2>
+                    <div id="finishedOrdersContainer" class="space-y-4">
+                        <!-- Finished orders will be loaded here -->
+                    </div>
+                </section>
+                
+                <!-- Statistics Section -->
+                <section id="statisticsSection" class="tab-content bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Estatísticas</h2>
+                    <div id="statisticsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Statistics will be loaded here -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Order Modal -->
+            <div id="orderModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+                    <h2 id="orderItemName" class="text-xl font-bold text-gray-800 mb-6"></h2>
+                    <form id="orderForm" class="space-y-4">
+                        <input type="hidden" id="orderItemType">
+                        <input type="hidden" id="orderItemId">
+                        <div>
+                            <label for="tableNumber" class="block text-gray-700 mb-2">Número da Mesa</label>
+                            <input type="text" id="tableNumber" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="quantity" class="block text-gray-700 mb-2">Quantidade</label>
+                            <input type="number" id="quantity" min="1" value="1" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="flex space-x-4">
+                            <button type="button" id="cancelOrderBtn" class="flex-1 bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition duration-200">Cancelar</button>
+                            <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Enviar Pedido</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script src="./restaurante.js"></script>
+    </body>
+</html>

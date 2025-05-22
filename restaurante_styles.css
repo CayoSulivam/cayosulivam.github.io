@@ -1,0 +1,30 @@
+.menu-item {
+    transition: all 0.3s ease;
+}
+.menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+.order-item {
+    border-left: 4px solid #3b82f6;
+}
+.completed-order {
+    border-left: 4px solid #10b981;
+}
+#imagePreview {
+    max-width: 200px;
+    max-height: 200px;
+    display: none;
+}
+.login-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 40;
+}

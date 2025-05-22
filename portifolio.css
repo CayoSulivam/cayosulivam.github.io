@@ -1,0 +1,402 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    scroll-behavior: smooth;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+}
+
+.skill-bar {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e5e7eb;
+    overflow: hidden;
+}
+
+.skill-progress {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #3b82f6;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -38px;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #3b82f6;
+    border: 3px solid #8b5cf6;
+}
+
+.section-title {
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+}
+
+.certification-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.certification-card {
+    transition: all 0.3s ease;
+}
+
+.certification-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile Menu Styles */
+.mobile-menu {
+    display: none;
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 40;
+}
+
+.mobile-menu.active {
+    display: block;
+}
+
+.mobile-menu a {
+    display: block;
+    padding: 12px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #4b5563;
+    transition: all 0.3s ease;
+}
+
+.mobile-menu a:hover {
+    background: #f9fafb;
+    color: #3b82f6;
+}
+.pdf-link {
+    cursor: pointer;
+    color: #f9fafb;
+    background-color: #a27ff3;
+             
+}
+
+.pdf-link:hover {
+    color: #f9fafb;
+    background-color: #8b5cf6;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-body {
+    padding: 0;
+    height: calc(90vh - 120px);
+}
+
+.pdf-container {
+    width: 100%;
+    height: 100%;
+}
+
+.pdf-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.modal-footer {
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 8px;
+}
+
+.modal-footer button {
+    background-color: #6b7280;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modal-footer button:hover {
+    background-color: #4b5563;
+}
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 1.5cm;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+        color: #000;
+        background: none !important;
+    }
+    
+    /* Hide elements not needed in print */
+    header, footer, #backToTop, .mobile-menu-button, .mobile-menu {
+        display: none !important;
+    }
+    
+    /* Adjust sections for print */
+    section {
+        page-break-inside: avoid;
+        margin-bottom: 2cm;
+        padding: 0 !important;
+    }
+    
+    /* Remove background colors and images */
+    .gradient-bg {
+        background: none !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Ensure text is readable */
+    h1, h2, h3, h4, h5, h6 {
+        color: #000 !important;
+    }
+    
+    /* Adjust skill bars for print */
+    .skill-bar {
+        border: 1px solid #000;
+    }
+    
+    .skill-progress {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Remove hover effects */
+    .project-card:hover, .certification-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Ensure links are readable */
+    a {
+        color: #000 !important;
+        text-decoration: underline;
+    }
+    
+    /* Remove unnecessary spacing */
+    .container {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+    
+    /* Adjust images for print */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* Force page breaks between major sections */
+    section:not(:first-child) {
+        page-break-before: always;
+    }
+    
+    /* Ensure background colors print properly */
+    .bg-white, .bg-gray-50, .bg-gray-100 {
+        background-color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Adjust contact form for print */
+    #contact form {
+        display: none;
+    }
+    
+    /* Show URLs after links */
+    a[href^="http"]:after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+        font-weight: normal;
+    }
+    
+    /* Hide decorative elements */
+    .section-title::after, .nav-link::after, .timeline-item::before {
+        display: none;
+    }
+}
+    /* Animações CSS */
+@keyframes fadeInDown {
+from {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+@keyframes fadeInUp {
+from {
+    opacity: 0;
+    transform: translateY(20px);
+}
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+@keyframes fadeInRight {
+from {
+    opacity: 0;
+    transform: translateX(20px);
+}
+to {
+    opacity: 1;
+    transform: translateX(0);
+}
+}
+
+@keyframes float {
+0%, 100% {
+    transform: translateY(0);
+}
+50% {
+    transform: translateY(-10px);
+}
+}
+
+@keyframes floatReverse {
+0%, 100% {
+    transform: translateY(0);
+}
+50% {
+    transform: translateY(10px);
+}
+}
+
+@keyframes pulse {
+0%, 100% {
+    opacity: 1;
+}
+50% {
+    opacity: 0.7;
+}
+}
+
+.animate-fade-in-down {
+animation: fadeInDown 1s ease-out forwards;
+}
+
+.animate-fade-in-up {
+animation: fadeInUp 1s ease-out forwards;
+}
+
+.animate-fade-in-right {
+animation: fadeInRight 1s ease-out forwards;
+}
+
+.animate-float {
+animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+animation: floatReverse 4s ease-in-out infinite;
+}
+
+.animate-pulse {
+animation: pulse 2s infinite;
+}
+
+.animate-delay-100 {
+animation-delay: 0.1s;
+}
+
+.animate-delay-200 {
+animation-delay: 0.2s;
+}
+
+.animate-delay-300 {
+animation-delay: 0.3s;
+}
