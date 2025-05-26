@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja Online - Cayo Store</title>
+    <link rel="icon" type="image/png" href="logo_loja.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./loja.css" />
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <header class="bg-f8f9fa text-indigo-900 shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-store text-2xl"></i>
+                <h1 class="text-xl font-bold">Cayo Store</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="cart-btn" class="relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+                <button id="login-btn" class="bg-white text-indigo-600 px-4 py-1 rounded-full font-medium hover:bg-indigo-50 transition">
+                    Entrar
+                </button>
+                <button id="orders-btn" class="hidden bg-white text-indigo-600 px-4 py-1 rounded-full font-medium hover:bg-indigo-50 transition">
+                    Meus Pedidos
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <section class="hero flex items-center justify-center text-white">
+        <div class="text-center px-4 animate-fade-in">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">CayoStore</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">Descubra os melhores produtos do mercado, com qualidade incomparável e garantia de satisfação.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Product Grid -->
+        <section>
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Nossos Produtos</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Os produtos serão carregados dinamicamente aqui -->
+            </div>
+        </section>
+    </main>
+    
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold">Seu Carrinho</h3>
+            <button id="close-cart" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div id="cart-items" class="p-4 space-y-4">
+            <!-- Cart items will be added here dynamically -->
+            <div class="text-center text-gray-500 py-8">
+                <i class="fas fa-shopping-cart text-4xl mb-2"></i>
+                <p>Seu carrinho está vazio</p>
+            </div>
+        </div>
+        
+        <div class="p-4 border-t border-gray-200">
+            <div class="mb-4">
+                <div class="flex justify-between mb-2">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between mb-2">
+                    <span>Frete:</span>
+                    <span id="shipping">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between font-bold text-lg">
+                    <span>Total:</span>
+                    <span id="total">R$ 0,00</span>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">CEP para cálculo de frete</label>
+                <div class="flex">
+                    <input type="text" id="cep" placeholder="00000-000" class="flex-1 px-3 py-2 border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <button id="calculate-shipping" class="bg-indigo-600 text-white px-4 py-2 rounded-r hover:bg-indigo-700 transition">
+                        Calcular
+                    </button>
+                </div>
+                <div id="shipping-result" class="text-sm mt-1 hidden"></div>
+            </div>
+            
+            <button id="btnFinalizar" class="w-full bg-green-600 text-white py-3 rounded font-medium hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                Finalizar Compra
+            </button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-4">Finalizar Compra</h3>
+                
+                <!-- Seção de Dados de Entrega (visível inicialmente) -->
+                <div id="delivery-section">
+                    <div class="mb-6">
+                        <h4 class="font-medium mb-2">Endereço de Entrega</h4>
+                        <div class="space-y-2">
+                            <input type="text" id="street" placeholder="Rua" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <input type="text" id="number" placeholder="Número" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <input type="text" id="complement" placeholder="Complemento" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <input type="text" id="neighborhood" placeholder="Bairro" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <input type="text" id="city" placeholder="Cidade" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <input type="text" id="state" placeholder="Estado" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between pt-4 border-t border-gray-200">
+                        <button id="cancel-checkout" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">
+                            Cancelar
+                        </button>
+                        <button id="proceed-to-payment" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+                            Opções de Pagamento
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Seção de Pagamento (oculta inicialmente) -->
+                <div id="payment-section" class="hidden">
+                    <div class="mb-6">
+                        <h4 class="font-medium mb-2">Método de Pagamento</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="payment" value="credit" class="text-indigo-600 focus:ring-indigo-500">
+                                <span>Cartão de Crédito</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="payment" value="debit" class="text-indigo-600 focus:ring-indigo-500">
+                                <span>Cartão de Débito</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="payment" value="pix" class="text-indigo-600 focus:ring-indigo-500" checked>
+                                <span>PIX</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="pix-section" class="mb-4">
+                        <div class="qr-code p-4 mb-4 flex flex-col items-center">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126580014BR.GOV.BCB.PIX01366fb3bbca-acf5-4531-9f4e-bd18540996695204000053039865802BR5925Cayo%20Sulivam%20Alves%20da%20Roc6009SAO%20PAULO62140510RRLFxfB1lm63042305" alt="QR Code PIX" class="mb-2">
+                            <p class="text-sm text-center">Escaneie o QR Code ou copie o código abaixo</p>
+                            <div class="bg-gray-100 p-2 rounded text-xs mt-2 text-center">
+                                <p>00020126580014BR.GOV.BCB.PIX01366fb3bbca-acf5-4531-9f4e-bd18540996695204000053039865802BR5925Cayo Sulivam Alves da Roc6009SAO PAULO62140510RRLFxfB1lm63042305</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-center text-gray-600">O pedido será confirmado após a confirmação do pagamento via PIX.</p>
+                    </div>
+                    
+                    <div id="card-section" class="hidden mb-4">
+                        <div class="space-y-2">
+                            <input type="text" id="card-number" placeholder="Número do Cartão" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <input type="text" id="card-name" placeholder="Nome no Cartão" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <div class="flex space-x-2">
+                                <input type="text" id="card-expiry" placeholder="MM/AA" class="w-1/2 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <input type="text" id="card-cvv" placeholder="CVV" class="w-1/2 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between pt-4 border-t border-gray-200">
+                        <button id="back-to-delivery" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">
+                            Voltar
+                        </button>
+                        <button id="confirm-order" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+                            Confirmar Pedido
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Order Confirmation Modal -->
+    <div id="order-confirmation" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                    <i class="fas fa-check text-green-600"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mt-3">Pedido Confirmado!</h3>
+                <div class="mt-2">
+                    <p class="text-sm text-gray-500">Seu pedido #<span id="order-number">12345</span> foi registrado com sucesso.</p>
+                    <p class="text-sm text-gray-500 mt-2">Você pode acompanhar o status na página de pedidos.</p>
+                </div>
+                <div class="mt-4">
+                    <button id="view-order" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Ver Pedido
+                    </button>
+                    <button id="close-confirmation" class="ml-3 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Continuar Comprando
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-4">Acesse sua conta</h3>
+                
+                <div class="mb-4">
+                    <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="login-email" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                </div>
+                
+                <div class="mb-6">
+                    <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="login-password" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <button id="do-login" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+                        Entrar
+                    </button>
+                    <button id="close-login" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">
+                        Cancelar
+                    </button>
+                </div>
+                
+                <p class="text-sm text-center text-gray-600">Não tem uma conta? <button id="show-register" class="text-indigo-600 hover:underline">Cadastre-se</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-4">Crie sua conta</h3>
+                
+                <div class="mb-4">
+                    <label for="register-name" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                    <input type="text" id="register-name" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="register-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="register-email" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="register-password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="register-password" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                </div>
+                
+                <div class="mb-6">
+                    <label for="register-confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirme a Senha</label>
+                    <input type="password" id="register-confirm" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <button id="do-register" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+                        Cadastrar
+                    </button>
+                    <button id="close-register" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">
+                        Cancelar
+                    </button>
+                </div>
+                
+                <p class="text-sm text-center text-gray-600">Já tem uma conta? <button id="show-login" class="text-indigo-600 hover:underline">Faça login</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Modal -->
+    <div id="orders-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">Meus Pedidos</h3>
+                    <button id="close-orders" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div id="orders-list" class="space-y-4">
+                    <!-- Order 1 -->
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <div class="bg-gray-50 px-4 py-3 flex justify-between items-center border-b border-gray-200">
+                            <div>
+                                <span class="font-medium">Pedido #12345</span>
+                                <span class="text-sm text-gray-500 ml-2">15/06/2023</span>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Em processamento</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between mb-2">
+                                <span>Smartphone Premium</span>
+                                <span>R$ 2.499,90</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span>Fones Bluetooth</span>
+                                <span>R$ 599,90</span>
+                            </div>
+                            <div class="flex justify-between pt-3 border-t border-gray-200">
+                                <span class="font-medium">Total:</span>
+                                <span class="font-medium">R$ 3.099,80</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order 2 -->
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <div class="bg-gray-50 px-4 py-3 flex justify-between items-center border-b border-gray-200">
+                            <div>
+                                <span class="font-medium">Pedido #12344</span>
+                                <span class="text-sm text-gray-500 ml-2">10/06/2023</span>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Entregue</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between mb-2">
+                                <span>Relógio Inteligente</span>
+                                <span>R$ 899,90</span>
+                            </div>
+                            <div class="flex justify-between pt-3 border-t border-gray-200">
+                                <span class="font-medium">Total:</span>
+                                <span class="font-medium">R$ 899,90</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="no-orders" class="text-center py-8 hidden">
+                    <i class="fas fa-box-open text-4xl text-gray-300 mb-2"></i>
+                    <p class="text-gray-500">Você ainda não fez nenhum pedido</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition opacity-0 invisible">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <script src="./loja.js"></script>
+</body>
+</html>

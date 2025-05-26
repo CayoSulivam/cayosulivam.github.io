@@ -1,0 +1,274 @@
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.cart-item {
+    transition: all 0.3s ease;
+}
+.cart-item:hover {
+    background-color: #f8f9fa;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.modal-overlay.active .modal-container {
+    transform: translateY(0);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #111827;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    transition: all 0.2s;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.auth-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.orders-modal {
+    max-width: 800px;
+}
+
+.order-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.order-header {
+    background-color: #f9fafb;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.order-status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-shipped {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-delivered {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.order-body {
+    padding: 1rem;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.order-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+    font-weight: 500;
+}
+
+.confirmation-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    margin: 0 auto;
+    background-color: #d1fae5;
+}
+
+.confirmation-icon i {
+    color: #10b981;
+    font-size: 1.5rem;
+}
+
+.payment-method {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.payment-method:hover {
+    border-color: #6366f1;
+}
+
+.payment-method input {
+    margin-right: 0.75rem;
+}
+
+.qr-code-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+    margin-bottom: 1rem;
+}
+.hero {
+    background: linear-gradient(rgba(171, 171, 171, 0.823), rgba(248, 249, 250)), url('./logo_loja.png');
+    background-size: cover;
+    background-position: center;
+    height: 60vh;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-out forwards;
+}
+
+
+
+@keyframes slideIn {
+    from { transform: translateY(20px); }
+    to { transform: translateY(0); }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slideIn {
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+@media (max-width: 640px) {
+    .modal-container {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .modal-body {
+        padding: 1rem;
+    }
+    
+    .qr-code-container img {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+    }
+}
