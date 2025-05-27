@@ -264,7 +264,7 @@ const firebaseConfig = {
           else if (collection === 'order') iconClass = 'fas fa-fw fa-shopping-cart';
           else if (collection === 'clientes') iconClass = 'fas fa-fw fa-address-book';
           
-          link.innerHTML = `<i class="${iconClass}"></i><span>${config.name}</span>`;
+          link.innerHTML = `<i class="${iconClass}" onClick="${fecharSidebar()}"></i><span>${config.name}</span>`;
           link.onclick = () => loadPage(collection);
           sidebarMenu.appendChild(link);
         }
