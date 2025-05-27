@@ -318,13 +318,17 @@ const firebaseConfig = {
                           <td>${formatFieldValue(item[field.name], field.type)}</td>
                           `).join('')}
                           <td>
-                          <button class="btn btn-sm btn-primary" onclick="showCRUDModal('edit', '${collection}', '${item.id}')">
-                              <i class="fas fa-edit"></i>
-                          </button>
-                          <button class="btn btn-sm btn-danger" onclick="deleteItem('${collection}', '${item.id}')">
-                              <i class="fas fa-trash"></i>
-                          </button>
-                          </td>
+                            ${collection === 'order' 
+                                ? generateOrderActions(item.id) 
+                                : `
+                                <button class="btn btn-sm btn-primary" onclick="showCRUDModal('edit', '${collection}', '${item.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteItem('${collection}', '${item.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                `}
+                        </td>
                       </tr>
                       `).join('')}
                   </tbody>
@@ -661,7 +665,11 @@ window.showRomaneio = async (orderId) => {
 };
       
       
-    
+ document.getElementById('modalSaveBtn').onclick = async () => {
+    await db.collection('order').doc(orderId).update({ status: 'Enviado' });
+    crudModal.hide();
+    showToast('Status do pedido atualizado para Enviado!', 'success');
+};
     // Mostrar modal de CRUD dinâmico
     window.showCRUDModal = async (action, collection, itemId = null) => {
       const modalTitle = document.getElementById('modalTitle');
@@ -818,9 +826,6 @@ window.showRomaneio = async (orderId) => {
             const id = typeof value === 'string' ? value.split('/').pop() : value.id || 'Referência';
             return `
               ${id}
-              <button class="btn btn-sm btn-outline-info ms-2" onclick="showReference('${value}')">
-                <i class="fas fa-eye"></i>
-              </button>
             `;
           case 'map':
             return Object.entries(value)
