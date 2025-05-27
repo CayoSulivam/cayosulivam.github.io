@@ -126,13 +126,18 @@ const collectionsConfig = {
     // Verificar autenticação
     auth.onAuthStateChanged(user => {
       if (user) {
-        document.getElementById('login-page').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
+        // Carregar dados do usuário antes de mostrar a aplicação
+        loadUserData(user.uid).then(() => {
+          document.getElementById('login-page').style.display = 'none';
+          document.getElementById('app').style.display = 'flex';
+        });
       } else {
+        // Redirecionar para login se não autenticado
         document.getElementById('login-page').style.display = 'flex';
         document.getElementById('app').style.display = 'none';
       }
     });
+
   });
   
   // Função de login
