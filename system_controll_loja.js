@@ -156,7 +156,11 @@ const collectionsConfig = {
     try {
         // Autenticar com Firebase Auth
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        currentUser = userCredential.user;
+        
+        // Verifique se o email foi verificado
+        if (!userCredential.user.emailVerified) {
+          throw new Error('Por favor, verifique seu email antes de fazer login');
+        }
         
         // Verificar se é um funcionário registrado
         const employeeSnapshot = await db.collection('employees')
@@ -178,8 +182,19 @@ const collectionsConfig = {
       loadPage('dashboard');
       
     } catch (error) {
-      console.error('Erro no login:', error);
-      errorElement.textContent = 'Ocorreu um erro durante o login.';
+        console.error('Erro detalhado:', error.code, error.message);
+        // Tratamento específico para cada erro
+        switch(error.code) {
+          case 'auth/operation-not-allowed':
+            alert('Método de login não habilitado. Contate o administrador.');
+            break;
+          case 'auth/user-not-found':
+          case 'auth/wrong-password':
+            alert('Credenciais inválidas');
+            break;
+          default:
+            alert('Erro desconhecido: ' + error.message);
+        }
     }
   }
   
