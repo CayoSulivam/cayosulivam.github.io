@@ -800,9 +800,6 @@ const firebaseConfig = {
             const id = typeof value === 'string' ? value.split('/').pop() : value.id || 'Referência';
             return `
               ${id}
-              <button class="btn btn-sm btn-outline-info ms-2" onclick="showReference('${value}')">
-                <i class="fas fa-eye"></i>
-              </button>
             `;
           case 'map':
             return Object.entries(value)
