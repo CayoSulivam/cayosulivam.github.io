@@ -562,10 +562,10 @@ const firebaseConfig = {
       // Configurar botão de salvar
       modalSaveBtn.onclick = async () => {
         const formData = {};
-        const fileInputs = {};
         const base64Promises = [];
+        const configFields = config.fields;
       
-        for (const field of config.fields) {
+        for (const field of configFields) {
           const element = document.getElementById(field.name);
       
           if (field.type === 'file') {
@@ -604,8 +604,9 @@ const firebaseConfig = {
         }
       
         try {
-          await Promise.all(base64Promises); // aguarda as leituras de imagem
+          await Promise.all(base64Promises); // Aguarda leitura de imagens
       
+          // Timestamps
           if (action === 'add') {
             formData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
           }
@@ -627,7 +628,6 @@ const firebaseConfig = {
           showToast(`Erro: ${error.message}`, 'danger');
         }
       };
-      
     
       // Mostrar referências para campos do tipo reference
       await populateReferenceSelects(collection, config);
