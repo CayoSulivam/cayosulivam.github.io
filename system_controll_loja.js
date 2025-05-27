@@ -298,12 +298,9 @@ const firebaseConfig = {
           <div class="card shadow mb-4">
               <div class="card-header py-3 d-flex justify-content-between align-items-center">
               <h6 class="m-0 font-weight-bold text-primary">${config.name}</h6>
-                ${['employees', 'products'].includes(collection) ? `
-                  <button class="btn btn-primary btn-sm" onclick="showCRUDModal('add', '${collection}')">
-                    <i class="fas fa-plus"></i> Adicionar
-                  </button>
-                ` : ''}
-
+              <button class="btn btn-primary btn-sm" onclick="showCRUDModal('add', '${collection}')">
+                  <i class="fas fa-plus"></i> Adicionar
+              </button>
               </div>
               <div class="card-body">
               <div class="table-responsive">
@@ -320,21 +317,14 @@ const firebaseConfig = {
                           ${config.fields.map(field => `
                           <td>${formatFieldValue(item[field.name], field.type)}</td>
                           `).join('')}
-                            <td>
-                              ${collection === 'order' 
-                                ? `
-                                  <button class="btn btn-sm btn-primary" onclick="showCRUDModal('edit', '${collection}', '${item.id}')">
-                                      <i class="fas fa-edit"></i>
-                                  </button>
-                                ` : `
-                                  <button class="btn btn-sm btn-primary" onclick="showCRUDModal('edit', '${collection}', '${item.id}')">
-                                      <i class="fas fa-edit"></i>
-                                  </button>
-                                  <button class="btn btn-sm btn-danger" onclick="deleteItem('${collection}', '${item.id}')">
-                                      <i class="fas fa-trash"></i>
-                                  </button>
-                                `}
-                            </td>
+                          <td>
+                          <button class="btn btn-sm btn-primary" onclick="showCRUDModal('edit', '${collection}', '${item.id}')">
+                              <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="btn btn-sm btn-danger" onclick="deleteItem('${collection}', '${item.id}')">
+                              <i class="fas fa-trash"></i>
+                          </button>
+                          </td>
                       </tr>
                       `).join('')}
                   </tbody>
@@ -351,21 +341,15 @@ const firebaseConfig = {
         const refs = document.querySelectorAll('[data-ref][data-type="reference"]');
       
         for (const el of refs) {
-            const path = el.getAttribute('data-ref');
-    
-            try {
-                const doc = await db.doc(path).get();
-                if (!doc.exists) {
-                    el.textContent = '[Desconhecido]';
-                } else {
-                    el.textContent = doc.data()['nome-completo'] || doc.id;
-                }
-            } catch {
-                el.textContent = '[Erro ao carregar]';
-            }
+          const path = el.getAttribute('data-ref');
+          try {
+            const doc = await db.doc(path).get();
+            el.textContent = doc.exists ? (doc.data()['nome-completo'] || doc.id) : '[Desconhecido]';
+          } catch {
+            el.textContent = '[Erro]';
+          }
         }
-    }
-
+      }
       
     
       function formatFieldValue(value, type) {
@@ -602,82 +586,64 @@ const firebaseConfig = {
       `;
     }
     
-window.showRomaneio = async (orderId) => {
-    const modalBody = document.getElementById('modalBody');
-    const modalTitle = document.getElementById('modalTitle');
-    const crudModal = new bootstrap.Modal(document.getElementById('crudModal'));
-
-    const orderDoc = await db.collection('order').doc(orderId).get();
-    if (!orderDoc.exists) {
-        alert("Pedido não encontrado.");
-        return;
-    }
-
-    const order = orderDoc.data();
-    let cliente = {};
-    
-    try {
-        if (order.cliente) {
-            const clienteDoc = await db.collection('clientes').doc(order.cliente).get();
-            cliente = clienteDoc.exists ? clienteDoc.data() : { 'nome-completo': '[Cliente desconhecido]', email: '[Email indisponível]' };
+    window.showRomaneio = async (orderId) => {
+        const modalBody = document.getElementById('modalBody');
+        const modalTitle = document.getElementById('modalTitle');
+        const crudModal = new bootstrap.Modal(document.getElementById('crudModal'));
+      
+        const orderDoc = await db.collection('order').doc(orderId).get();
+        const order = orderDoc.data();
+      
+        let cliente = {};
+        if (order.cliente && typeof order.cliente.get === 'function') {
+          const clienteDoc = await order.cliente.get();
+          if (clienteDoc.exists) {
+            cliente = clienteDoc.data();
+          }
         }
-    } catch {
-        cliente = { 'nome-completo': '[Erro ao carregar cliente]', email: '[Erro]' };
-    }
-
-    const itemsHTML = await Promise.all(order.itens.map(async ref => {
-        try {
-            const prodDoc = await db.collection('products').doc(ref).get();
-            if (!prodDoc.exists) {
-                return `<div>[Produto inválido]</div>`;
-            }
+      
+        const itemsHTML = await Promise.all(
+          order.itens.map(async ref => {
+            const prodDoc = await ref.get();
             const prod = prodDoc.data();
             return `
-                <div class="d-flex align-items-center mb-2">
-                    <img src="${prod.imagem}" class="img-thumbnail me-2" style="height: 60px;">
-                    <div>
-                        <strong>${prod.produto}</strong>
-                        <small>${prod.descricao || ''}</small>
-                    </div>
+              <div class="d-flex align-items-center mb-2">
+                <img src="${prod.imagem}" class="img-thumbnail me-2" style="height: 60px;">
+                <div>
+                  <div><strong>${prod.produto}</strong></div>
+                  <small>${prod.descricao || ''}</small>
                 </div>
+              </div>
             `;
-        } catch {
-            return `<div>[Erro ao carregar produto]</div>`;
-        }
-    }));
-
-    modalTitle.textContent = `Romaneio da Ordem ${orderId}`;
-    modalBody.innerHTML = `
-        <div>
+          })
+        );
+      
+        modalTitle.textContent = `Romaneio da Ordem ${orderId}`;
+        modalBody.innerHTML = `
+          <div>
             <h5>Cliente</h5>
-            <p><strong>Nome:</strong> ${cliente['nome-completo']}</p>
-            <p><strong>Email:</strong> ${cliente.email}</p>
-
+            <p><strong>Nome:</strong> ${cliente['nome-completo'] || '[sem nome]'}</p>
+            <p><strong>Email:</strong> ${cliente.email || '[sem email]'}</p>
+      
             <h5>Endereço</h5>
             <p>${order.endereco?.rua}, ${order.endereco?.numero} - ${order.endereco?.bairro}</p>
             <p>${order.endereco?.cidade} / ${order.endereco?.estado} - CEP: ${order.endereco?.cep}</p>
-
+      
             <h5>Itens</h5>
             ${itemsHTML.join('')}
-
+      
             <h5>Pagamento</h5>
             <p><strong>Método:</strong> ${order.metodoPagamento}</p>
             <p><strong>Status:</strong> ${order.status}</p>
             <p><strong>Total:</strong> R$ ${order.total.toFixed(2).replace('.', ',')}</p>
-        </div>
-    `;
-
-    crudModal.show();
-};
+          </div>
+        `;
       
-      
-    const saveBtn = document.getElementById('modalSaveBtn');
-    saveBtn.onclick = async () => {
-      await db.collection('order').doc(orderId).update({ status: 'Enviado' });
-      crudModal.hide();
-      showToast('Status do pedido atualizado para Enviado!', 'success');
+        crudModal.show();
     };
-
+      
+      
+    
     // Mostrar modal de CRUD dinâmico
     window.showCRUDModal = async (action, collection, itemId = null) => {
       const modalTitle = document.getElementById('modalTitle');
@@ -714,78 +680,87 @@ window.showRomaneio = async (orderId) => {
       
       // Configurar botão de salvar
       modalSaveBtn.onclick = async () => {
-  const formData = {};
-  const base64Promises = [];
-  const configFields = config.fields;
-
-  for (const field of configFields) {
-    const element = document.getElementById(field.name);
-    if (!element && field.type !== 'map' && field.type !== 'array') continue;
-
-    if (field.type === 'file') {
-      if (element && element.files.length > 0) {
-        const file = element.files[0];
-        const reader = new FileReader();
-
-        const promise = new Promise((resolve) => {
-          reader.onloadend = () => {
-            formData[field.name] = reader.result; // base64 string
-            resolve();
-          };
-        });
-
-        reader.readAsDataURL(file);
-        base64Promises.push(promise);
-      } else if (action === 'edit' && itemData[field.name]) {
-        formData[field.name] = itemData[field.name];
-      }
-    } else if (field.type === 'checkbox' && element) {
-      formData[field.name] = element.checked;
-    } else if (field.type === 'map') {
-      const mapData = {};
-      field.subfields.forEach(sub => {
-        const subEl = document.getElementById(`${field.name}_${sub.name}`);
-        if (subEl) {
-          mapData[sub.name] = subEl.type === 'checkbox' ? subEl.checked : subEl.value;
+        const formData = {};
+        const base64Promises = [];
+        const configFields = config.fields;
+      
+        for (const field of configFields) {
+          const element = document.getElementById(field.name);
+      
+          if (field.type === 'file') {
+            if (element.files.length > 0) {
+              const file = element.files[0];
+              const reader = new FileReader();
+      
+              const promise = new Promise((resolve) => {
+                reader.onloadend = () => {
+                  formData[field.name] = reader.result; // base64 string
+                  resolve();
+                };
+              });
+      
+              reader.readAsDataURL(file);
+              base64Promises.push(promise);
+            } else if (action === 'edit' && itemData[field.name]) {
+              formData[field.name] = itemData[field.name];
+            }
+          } else if (field.type === 'checkbox') {
+            formData[field.name] = element.checked;
+          } else if (field.type === 'map') {
+            const mapData = {};
+            field.subfields.forEach(sub => {
+              mapData[sub.name] = document.getElementById(`${field.name}_${sub.name}`).value;
+            });
+            formData[field.name] = mapData;
+          } else if (field.type === 'array') {
+            const items = [];
+            const itemElements = document.querySelectorAll(`#${field.name}_items select`);
+            itemElements.forEach(el => items.push(el.value));
+            formData[field.name] = items;
+          } else {
+            formData[field.name] = element.value;
+          }
         }
-      });
-      formData[field.name] = mapData;
-    } else if (field.type === 'array') {
-      const items = [];
-      const itemElements = document.querySelectorAll(`#${field.name}_items select`);
-      itemElements.forEach(el => items.push(el.value));
-      formData[field.name] = items;
-    } else if (element) {
-      formData[field.name] = element.value;
-    }
-  }
+      
+        try {
+          await Promise.all(base64Promises); // Aguarda leitura de imagens
+      
+          // Timestamps
+          if (action === 'add') {
+            formData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          }
+          formData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+      
+          if (action === 'add') {
+            await db.collection(collection).add(formData);
+            showToast(`${config.singular} criado com sucesso!`, 'success');
+          } else {
+            await db.collection(collection).doc(itemId).update(formData);
+            showToast(`${config.singular} atualizado com sucesso!`, 'success');
+          }
+      
+          crudModal.hide();
+          await loadPage(collection);
+      
+        } catch (error) {
+          console.error('Erro ao salvar:', error);
+          showToast(`Erro: ${error.message}`, 'danger');
+        }
+      };
+    
+      // Mostrar referências para campos do tipo reference
+      await populateReferenceSelects(collection, config, itemData);
 
-  try {
-    await Promise.all(base64Promises); // Aguarda leitura de imagens
-
-    // Timestamps
-    if (action === 'add') {
-      formData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-    }
-    formData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-
-    if (action === 'add') {
-      await db.collection(collection).add(formData);
-      showToast(`${config.singular} criado com sucesso!`, 'success');
-    } else {
-      await db.collection(collection).doc(itemId).update(formData);
-      showToast(`${config.singular} atualizado com sucesso!`, 'success');
-    }
-
-    crudModal.hide();
-    await loadPage(collection);
-
-  } catch (error) {
-    console.error('Erro ao salvar:', error);
-    showToast(`Erro: ${error.message}`, 'danger');
-  }
-};
-
+      
+      // Mostrar itens existentes para arrays
+      if (itemData.itens) {
+        for (const itemId of itemData.itens) {
+          await addArrayItem('itens', 'products', itemId);
+        }
+      }
+    
+      crudModal.show();
+    };
     
     
     // Funções auxiliares
@@ -825,6 +800,9 @@ window.showRomaneio = async (orderId) => {
             const id = typeof value === 'string' ? value.split('/').pop() : value.id || 'Referência';
             return `
               ${id}
+              <button class="btn btn-sm btn-outline-info ms-2" onclick="showReference('${value}')">
+                <i class="fas fa-eye"></i>
+              </button>
             `;
           case 'map':
             return Object.entries(value)
