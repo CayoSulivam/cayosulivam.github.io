@@ -10,10 +10,10 @@ const firebaseConfig = {
   };
   
   // Inicialização do Firebase
-  const app = firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const storage = firebase.storage();
-  const auth = firebase.auth();
+  storage.ref().bucket = 'cayosulivamprojetos.appspot.com';
   
   // Instâncias de modal
   const crudModal = new bootstrap.Modal(document.getElementById('crudModal'));
@@ -145,18 +145,21 @@ const collectionsConfig = {
     }
     
     try {
-      const querySnapshot = await db.collection('employees')
-        .where('email', '==', email)
-        .where('password', '==', password)
-        .get();
-      
-      if (querySnapshot.empty) {
-        errorElement.textContent = 'Credenciais inválidas.';
-        return;
-      }
-      
-      currentUser = querySnapshot.docs[0].data();
-      currentUser.id = querySnapshot.docs[0].id;
+        // Autenticar com Firebase Auth
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        currentUser = userCredential.user;
+        
+        // Verificar se é um funcionário registrado
+        const employeeSnapshot = await db.collection('employees')
+            .where('email', '==', email)
+            .limit(1)
+            .get();
+
+        if (employeeSnapshot.empty) {
+            throw new Error('Acesso não autorizado');
+        }
+
+        currentUser.data = employeeSnapshot.docs[0].data();
       
       document.getElementById('login-page').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
