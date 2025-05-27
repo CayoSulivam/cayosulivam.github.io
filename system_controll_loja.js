@@ -564,14 +564,18 @@ const firebaseConfig = {
                       ${config.fields.map(field => `
                         <td>${renderFieldValue(item[field.name], field.type)}</td>
                       `).join('')}
-                      <td>
-                        <button class="btn btn-sm btn-primary" onclick="showCRUDModal('edit', '${collection}', '${item.id}')">
-                          <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteItem('${collection}', '${item.id}')">
-                          <i class="fas fa-trash"></i>
-                        </button>
-                      </td>
+                        <td>
+                        ${collection === 'order' 
+                            ? generateOrderActions(item.id) 
+                            : `
+                            <button class="btn btn-sm btn-primary" onclick="showCRUDModal('edit', '${collection}', '${item.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem('${collection}', '${item.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            `}
+                        </td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -581,6 +585,57 @@ const firebaseConfig = {
         </div>
       `;
     }
+    
+    window.showRomaneio = async (orderId) => {
+        const modalBody = document.getElementById('modalBody');
+        const modalTitle = document.getElementById('modalTitle');
+        const crudModal = new bootstrap.Modal(document.getElementById('crudModal'));
+      
+        const orderDoc = await db.collection('order').doc(orderId).get();
+        const order = orderDoc.data();
+        const clienteDoc = await order.cliente.get();
+        const cliente = clienteDoc.data();
+      
+        const itemsHTML = await Promise.all(
+          order.itens.map(async ref => {
+            const prodDoc = await ref.get();
+            const prod = prodDoc.data();
+            return `
+              <div class="d-flex align-items-center mb-2">
+                <img src="${prod.imagem}" class="img-thumbnail me-2" style="height: 60px;">
+                <div>
+                  <div><strong>${prod.produto}</strong></div>
+                  <small>${prod.descricao || ''}</small>
+                </div>
+              </div>
+            `;
+          })
+        );
+      
+        modalTitle.textContent = `Romaneio da Ordem ${orderId}`;
+        modalBody.innerHTML = `
+          <div>
+            <h5>Cliente</h5>
+            <p><strong>Nome:</strong> ${cliente['nome-completo']}</p>
+            <p><strong>Email:</strong> ${cliente.email}</p>
+      
+            <h5>Endereço</h5>
+            <p>${order.endereco.rua}, ${order.endereco.numero} - ${order.endereco.bairro}</p>
+            <p>${order.endereco.cidade} / ${order.endereco.estado} - CEP: ${order.endereco.cep}</p>
+      
+            <h5>Itens</h5>
+            ${itemsHTML.join('')}
+      
+            <h5>Pagamento</h5>
+            <p><strong>Método:</strong> ${order.metodoPagamento}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+            <p><strong>Total:</strong> R$ ${order.total.toFixed(2).replace('.', ',')}</p>
+          </div>
+        `;
+      
+        crudModal.show();
+      };
+      
     
     // Mostrar modal de CRUD dinâmico
     window.showCRUDModal = async (action, collection, itemId = null) => {
@@ -737,21 +792,39 @@ const firebaseConfig = {
           case 'reference':
             const id = typeof value === 'string' ? value.split('/').pop() : value.id || 'Referência';
             return `
-                ${id}
-                <button class="btn btn-sm btn-outline-info ms-2" onclick="showReference('${value}')">
+              ${id}
+              <button class="btn btn-sm btn-outline-info ms-2" onclick="showReference('${value}')">
                 <i class="fas fa-eye"></i>
-                </button>
+              </button>
             `;
           case 'map':
-            return Object.entries(value).map(([k, v]) => `<div><strong>${k}:</strong> ${v}</div>`).join('');
+            return Object.entries(value)
+              .filter(([_, v]) => v === true)
+              .map(([k]) => `<span class="badge bg-primary me-1">${k}</span>`)
+              .join('');
           case 'array':
             return Array.isArray(value) ? `${value.length} item(s)` : '-';
           case 'file':
-            return `<img src="${value}" class="img-thumbnail" style="max-height: 60px;">`;  
+            return `<img src="${value}" class="img-thumbnail" style="max-height: 60px;">`;
           default:
             return value.toString();
         }
     }
+    
+    function generateOrderActions(orderId) {
+        return `
+          <button class="btn btn-sm btn-primary" onclick="showCRUDModal('edit', 'order', '${orderId}')">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deleteItem('order', '${orderId}')">
+            <i class="fas fa-trash"></i>
+          </button>
+          <button class="btn btn-sm btn-info" onclick="showRomaneio('${orderId}')">
+            <i class="fas fa-truck"></i> Romaneio de Entrega
+          </button>
+        `;
+    }
+    
     window.showReference = async (refPath) => {
         try {
           const docRef = typeof refPath === 'string' ? db.doc(refPath) : refPath;
