@@ -1,20 +1,24 @@
 // Configuração do Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyBEZaulMnzoFYHiiRxQDvUS4U5VaroQeA8",
-    authDomain: "cayosulivamprojetos.firebaseapp.com",
-    projectId: "cayosulivamprojetos",
-    storageBucket: "cayosulivamprojetos.appspot.com",
-    messagingSenderId: "329161017739",
-    appId: "1:329161017739:web:36696a0fc8de564601878e",
-    measurementId: "G-D5FHWFS5E5"
-  };
-  
-  // Inicialização do Firebase
+  apiKey: "AIzaSyBEZaulMnzoFYHiiRxQDvUS4U5VaroQeA8",
+  authDomain: "cayosulivamprojetos.firebaseapp.com",
+  projectId: "cayosulivamprojetos",
+  storageBucket: "cayosulivamprojetos.appspot.com",
+  messagingSenderId: "329161017739",
+  appId: "1:329161017739:web:36696a0fc8de564601878e",
+  measurementId: "G-D5FHWFS5E5"
+};
+
+// Inicialização garantida
+if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const storage = firebase.storage();
-  const auth = firebase.auth();
-  
+}
+const db = firebase.firestore();
+const storage = firebase.storage();
+const auth = firebase.auth(); // Agora auth está definida
+
+// Restante do código...
+
   // Instâncias de modal
   const crudModal = new bootstrap.Modal(document.getElementById('crudModal'));
   const userModal = new bootstrap.Modal(document.getElementById('userModal'));
