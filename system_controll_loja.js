@@ -593,11 +593,13 @@ const firebaseConfig = {
       
         const orderDoc = await db.collection('order').doc(orderId).get();
         const order = orderDoc.data();
-        
+      
         let cliente = {};
-        if (order.cliente && order.cliente.get) {
+        if (order.cliente && typeof order.cliente.get === 'function') {
           const clienteDoc = await order.cliente.get();
-          cliente = clienteDoc.exists ? clienteDoc.data() : {};
+          if (clienteDoc.exists) {
+            cliente = clienteDoc.data();
+          }
         }
       
         const itemsHTML = await Promise.all(
@@ -620,12 +622,12 @@ const firebaseConfig = {
         modalBody.innerHTML = `
           <div>
             <h5>Cliente</h5>
-            <p><strong>Nome:</strong> ${cliente['nome-completo']}</p>
-            <p><strong>Email:</strong> ${cliente.email}</p>
+            <p><strong>Nome:</strong> ${cliente['nome-completo'] || '[sem nome]'}</p>
+            <p><strong>Email:</strong> ${cliente.email || '[sem email]'}</p>
       
             <h5>Endereço</h5>
-            <p>${order.endereco.rua}, ${order.endereco.numero} - ${order.endereco.bairro}</p>
-            <p>${order.endereco.cidade} / ${order.endereco.estado} - CEP: ${order.endereco.cep}</p>
+            <p>${order.endereco?.rua}, ${order.endereco?.numero} - ${order.endereco?.bairro}</p>
+            <p>${order.endereco?.cidade} / ${order.endereco?.estado} - CEP: ${order.endereco?.cep}</p>
       
             <h5>Itens</h5>
             ${itemsHTML.join('')}
@@ -638,7 +640,8 @@ const firebaseConfig = {
         `;
       
         crudModal.show();
-      };
+    };
+      
       
     
     // Mostrar modal de CRUD dinâmico
@@ -831,21 +834,27 @@ const firebaseConfig = {
     
     window.showReference = async (refPath) => {
         try {
-          const docRef = typeof refPath === 'string' ? db.doc(refPath) : (refPath?.path ? db.doc(refPath.path) : null);
+          let docRef;
+      
+          if (typeof refPath === 'string') {
+            docRef = db.doc(refPath);
+          } else if (refPath && typeof refPath.path === 'string') {
+            docRef = db.doc(refPath.path);
+          } else {
+            throw new Error('Referência inválida.');
+          }
+      
           const doc = await docRef.get();
-          if (!docRef) {
-            alert('Referência inválida.');
+          if (!doc.exists) {
+            alert('Referência não encontrada.');
             return;
           }
-          
-          if (!doc.exists) return alert('Referência não encontrada.');
       
           const dados = doc.data();
           const detalhes = Object.entries(dados).map(([k, v]) => {
             return `<div><strong>${k}:</strong> ${typeof v === 'object' ? JSON.stringify(v) : v}</div>`;
           }).join('');
       
-          const modal = new bootstrap.Modal(document.createElement('div'));
           const wrapper = document.createElement('div');
           wrapper.innerHTML = `
             <div class="modal fade show d-block" tabindex="-1">
@@ -865,7 +874,8 @@ const firebaseConfig = {
           console.error('Erro ao exibir referência:', err);
           alert('Erro ao buscar dados da referência.');
         }
-      };     
+    };
+          
     
     function generateFormField(field, value = '') {
       switch(field.type) {
