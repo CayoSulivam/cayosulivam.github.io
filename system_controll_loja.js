@@ -292,8 +292,24 @@ const firebaseConfig = {
               </div>
           </div>
           `;
+          await resolveReferences();
+
       }
     
+      async function resolveReferences() {
+        const refs = document.querySelectorAll('[data-ref][data-type="reference"]');
+      
+        for (const el of refs) {
+          const path = el.getAttribute('data-ref');
+          try {
+            const doc = await db.doc(path).get();
+            el.textContent = doc.exists ? (doc.data()['nome-completo'] || doc.id) : '[Desconhecido]';
+          } catch {
+            el.textContent = '[Erro]';
+          }
+        }
+      }
+      
     
       function formatFieldValue(value, type) {
           if (value === undefined || value === null) return '-';
@@ -667,17 +683,27 @@ const firebaseConfig = {
     }
     
     function renderFieldValue(value, type) {
-      if (value === undefined || value === null) return '-';
+        if (value === undefined || value === null) return '-';
       
-      switch(type) {
-        case 'checkbox':
-          return value ? 'Sim' : 'Não';
-        case 'date':
-          return new Date(value).toLocaleDateString();
-        default:
-          return value.toString();
-      }
+        switch (type) {
+          case 'checkbox':
+            return value ? 'Sim' : 'Não';
+          case 'date':
+          case 'datetime':
+          case 'timestamp':
+            return value.toDate ? value.toDate().toLocaleString() : new Date(value).toLocaleString();
+          case 'reference':
+            // Exibe o ID, mas pode buscar o nome
+            return typeof value === 'string' ? value.split('/').pop() : (value.id || 'Referência');
+          case 'map':
+            return Object.entries(value).map(([k, v]) => `<div><strong>${k}:</strong> ${v}</div>`).join('');
+          case 'array':
+            return Array.isArray(value) ? `${value.length} item(s)` : '-';
+          default:
+            return value.toString();
+        }
     }
+      
     
     function generateFormField(field, value = '') {
       switch(field.type) {
