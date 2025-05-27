@@ -112,7 +112,47 @@ const firebaseConfig = {
         },
         { name: 'total', label: 'Total', type: 'number', required: true }
       ]
-    }
+    },
+    'employees': {
+        name: 'Funcionários',
+        singular: 'Funcionário',
+        fields: [
+            { name: 'email', label: 'Email', type: 'email', required: true },
+            { name: 'name', label: 'Nome', type: 'text', required: true },
+            { name: 'active', label: 'Ativo', type: 'checkbox', default: true },
+            {
+            name: 'pages',
+            label: 'Permissões de Módulo',
+            type: 'map',
+            subfields: [
+                { name: 'order', label: 'Pedidos', type: 'checkbox' },
+                { name: 'clientes', label: 'Clientes', type: 'checkbox' },
+                { name: 'employees', label: 'Funcionários', type: 'checkbox' },
+                { name: 'products', label: 'Produtos', type: 'checkbox' },
+                { name: 'general', label: 'Geral', type: 'checkbox' },
+                { name: 'Dashboard', label: 'Dashboard', type: 'checkbox' }
+            ]
+            },
+            {
+            name: 'position',
+            label: 'Cargo',
+            type: 'map',
+            subfields: [
+                { name: 'Administrator', label: 'Administrador', type: 'checkbox' },
+                { name: 'Common', label: 'Comum', type: 'checkbox' },
+                { name: 'Developer', label: 'Desenvolvedor', type: 'checkbox' },
+                { name: 'Manager', label: 'Gerente', type: 'checkbox' }
+            ]
+            }
+        ],
+        permissions: {
+            create: true,
+            read: true,
+            update: true,
+            delete: true
+        }
+        }
+
   };
     
     
@@ -647,7 +687,8 @@ const firebaseConfig = {
       };
     
       // Mostrar referências para campos do tipo reference
-      await populateReferenceSelects(collection, config);
+      await populateReferenceSelects(collection, config, itemData);
+
       
       // Mostrar itens existentes para arrays
       if (itemData.itens) {
@@ -694,17 +735,55 @@ const firebaseConfig = {
           case 'timestamp':
             return value.toDate ? value.toDate().toLocaleString() : new Date(value).toLocaleString();
           case 'reference':
-            // Exibe o ID, mas pode buscar o nome
-            return typeof value === 'string' ? value.split('/').pop() : (value.id || 'Referência');
+            const id = typeof value === 'string' ? value.split('/').pop() : value.id || 'Referência';
+            return `
+                ${id}
+                <button class="btn btn-sm btn-outline-info ms-2" onclick="showReference('${value}')">
+                <i class="fas fa-eye"></i>
+                </button>
+            `;
           case 'map':
             return Object.entries(value).map(([k, v]) => `<div><strong>${k}:</strong> ${v}</div>`).join('');
           case 'array':
             return Array.isArray(value) ? `${value.length} item(s)` : '-';
+          case 'file':
+            return `<img src="${value}" class="img-thumbnail" style="max-height: 60px;">`;  
           default:
             return value.toString();
         }
     }
+    window.showReference = async (refPath) => {
+        try {
+          const docRef = typeof refPath === 'string' ? db.doc(refPath) : refPath;
+          const doc = await docRef.get();
+          if (!doc.exists) return alert('Referência não encontrada.');
       
+          const dados = doc.data();
+          const detalhes = Object.entries(dados).map(([k, v]) => {
+            return `<div><strong>${k}:</strong> ${typeof v === 'object' ? JSON.stringify(v) : v}</div>`;
+          }).join('');
+      
+          const modal = new bootstrap.Modal(document.createElement('div'));
+          const wrapper = document.createElement('div');
+          wrapper.innerHTML = `
+            <div class="modal fade show d-block" tabindex="-1">
+              <div class="modal-dialog"><div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Referência: ${doc.id}</h5>
+                  <button class="btn-close" onclick="this.closest('.modal').remove()"></button>
+                </div>
+                <div class="modal-body">${detalhes}</div>
+                <div class="modal-footer">
+                  <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Fechar</button>
+                </div>
+              </div></div>
+            </div>
+          `;
+          document.body.appendChild(wrapper);
+        } catch (err) {
+          console.error('Erro ao exibir referência:', err);
+          alert('Erro ao buscar dados da referência.');
+        }
+      };     
     
     function generateFormField(field, value = '') {
       switch(field.type) {
@@ -768,28 +847,28 @@ const firebaseConfig = {
     }
     
     
-    // Preencher selects de referência
   // Preencher selects de referência
-  async function populateReferenceSelects(collection, config) {
-      for (const field of config.fields) {
-        if (field.type === 'reference') {
-          const select = document.getElementById(field.name);
-          const snapshot = await db.collection(field.collection).get();
-          
-          snapshot.docs.forEach(doc => {
-            const option = document.createElement('option');
-            option.value = doc.id;
-            option.textContent = doc.data()[field.displayField] || doc.id;
-            select.appendChild(option);
-          });
-          
-          // Selecionar valor atual se for edição
-          if (selectedItemId && itemData[field.name]) {
-            select.value = itemData[field.name];
-          }
+  async function populateReferenceSelects(collection, config, itemData = {}) {
+    for (const field of config.fields) {
+      if (field.type === 'reference') {
+        const select = document.getElementById(field.name);
+        const snapshot = await db.collection(field.collection).get();
+  
+        snapshot.docs.forEach(doc => {
+          const option = document.createElement('option');
+          option.value = doc.id;
+          option.textContent = doc.data()[field.displayField] || doc.id;
+          select.appendChild(option);
+        });
+  
+        // Selecionar valor atual se for edição
+        if (selectedItemId && itemData[field.name]) {
+          select.value = itemData[field.name];
         }
       }
     }
+  }
+  
     
     // Adicionar itens a arrays (versão atualizada)
     window.addArrayItem = async (fieldName, collection, itemId = null) => {
@@ -826,8 +905,9 @@ const firebaseConfig = {
       document.querySelector('.sidebar').classList.toggle('show');
     };
     window.fecharSidebar = () => {
-        document.querySelector('.sidebar').classList.toggle('hide');
+        document.querySelector('.sidebar').classList.remove('show');
     };
+      
     
     window.logout = () => {
       currentUser = null;
