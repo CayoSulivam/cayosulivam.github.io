@@ -593,8 +593,12 @@ const firebaseConfig = {
       
         const orderDoc = await db.collection('order').doc(orderId).get();
         const order = orderDoc.data();
-        const clienteDoc = await order.cliente.get();
-        const cliente = clienteDoc.data();
+        
+        let cliente = {};
+        if (order.cliente && order.cliente.get) {
+          const clienteDoc = await order.cliente.get();
+          cliente = clienteDoc.exists ? clienteDoc.data() : {};
+        }
       
         const itemsHTML = await Promise.all(
           order.itens.map(async ref => {
@@ -827,8 +831,13 @@ const firebaseConfig = {
     
     window.showReference = async (refPath) => {
         try {
-          const docRef = typeof refPath === 'string' ? db.doc(refPath) : refPath;
+          const docRef = typeof refPath === 'string' ? db.doc(refPath) : (refPath?.path ? db.doc(refPath.path) : null);
           const doc = await docRef.get();
+          if (!docRef) {
+            alert('Referência inválida.');
+            return;
+          }
+          
           if (!doc.exists) return alert('Referência não encontrada.');
       
           const dados = doc.data();
