@@ -154,25 +154,18 @@ const collectionsConfig = {
     }
     
     try {
-        // Autenticar com Firebase Auth
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        
-        // Verifique se o email foi verificado
-        if (!userCredential.user.emailVerified) {
-          throw new Error('Por favor, verifique seu email antes de fazer login');
-        }
-        
-        // Verificar se é um funcionário registrado
-        const employeeSnapshot = await db.collection('employees')
-            .where('email', '==', email)
-            .limit(1)
-            .get();
-
-        if (employeeSnapshot.empty) {
-            throw new Error('Acesso não autorizado');
-        }
-
-        currentUser.data = employeeSnapshot.docs[0].data();
+      const querySnapshot = await db.collection('employees')
+        .where('email', '==', email)
+        .where('password', '==', password)
+        .get();
+      
+      if (querySnapshot.empty) {
+        errorElement.textContent = 'Credenciais inválidas.';
+        return;
+      }
+      
+      currentUser = querySnapshot.docs[0].data();
+      currentUser.id = querySnapshot.docs[0].id;
       
       document.getElementById('login-page').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
@@ -180,6 +173,7 @@ const collectionsConfig = {
       
       buildSidebarMenu();
       loadPage('dashboard');
+      
       
     } catch (error) {
         console.error('Erro detalhado:', error.code, error.message);
