@@ -121,6 +121,7 @@ const firebaseConfig = {
       // Configurar listeners
       document.getElementById('loginBtn')?.addEventListener('click', login);
       document.getElementById('toggleSidebar')?.addEventListener('click', toggleSidebar);
+      document.getElementById('fecharSidebar')?.addEventListener('click', fecharSidebar);
       document.getElementById('logout')?.addEventListener('click', logout);
     
       // Verificar autenticação
@@ -823,6 +824,9 @@ const firebaseConfig = {
     // Funções globais
     window.toggleSidebar = () => {
       document.querySelector('.sidebar').classList.toggle('show');
+    };
+    window.fecharSidebar = () => {
+        document.querySelector('.sidebar').classList.toggle('hide');
     };
     
     window.logout = () => {
