@@ -341,15 +341,21 @@ const firebaseConfig = {
         const refs = document.querySelectorAll('[data-ref][data-type="reference"]');
       
         for (const el of refs) {
-          const path = el.getAttribute('data-ref');
-          try {
-            const doc = await db.doc(path).get();
-            el.textContent = doc.exists ? (doc.data()['nome-completo'] || doc.id) : '[Desconhecido]';
-          } catch {
-            el.textContent = '[Erro]';
-          }
+            const path = el.getAttribute('data-ref');
+    
+            try {
+                const doc = await db.doc(path).get();
+                if (!doc.exists) {
+                    el.textContent = '[Desconhecido]';
+                } else {
+                    el.textContent = doc.data()['nome-completo'] || doc.id;
+                }
+            } catch {
+                el.textContent = '[Erro ao carregar]';
+            }
         }
-      }
+    }
+
       
     
       function formatFieldValue(value, type) {
@@ -586,61 +592,73 @@ const firebaseConfig = {
       `;
     }
     
-    window.showRomaneio = async (orderId) => {
-        const modalBody = document.getElementById('modalBody');
-        const modalTitle = document.getElementById('modalTitle');
-        const crudModal = new bootstrap.Modal(document.getElementById('crudModal'));
-      
-        const orderDoc = await db.collection('order').doc(orderId).get();
-        const order = orderDoc.data();
-      
-        let cliente = {};
-        if (order.cliente && typeof order.cliente.get === 'function') {
-          const clienteDoc = await order.cliente.get();
-          if (clienteDoc.exists) {
-            cliente = clienteDoc.data();
-          }
+window.showRomaneio = async (orderId) => {
+    const modalBody = document.getElementById('modalBody');
+    const modalTitle = document.getElementById('modalTitle');
+    const crudModal = new bootstrap.Modal(document.getElementById('crudModal'));
+
+    const orderDoc = await db.collection('order').doc(orderId).get();
+    if (!orderDoc.exists) {
+        alert("Pedido não encontrado.");
+        return;
+    }
+
+    const order = orderDoc.data();
+    let cliente = {};
+    
+    try {
+        if (order.cliente) {
+            const clienteDoc = await db.collection('clientes').doc(order.cliente).get();
+            cliente = clienteDoc.exists ? clienteDoc.data() : { 'nome-completo': '[Cliente desconhecido]', email: '[Email indisponível]' };
         }
-      
-        const itemsHTML = await Promise.all(
-          order.itens.map(async ref => {
-            const prodDoc = await ref.get();
+    } catch {
+        cliente = { 'nome-completo': '[Erro ao carregar cliente]', email: '[Erro]' };
+    }
+
+    const itemsHTML = await Promise.all(order.itens.map(async ref => {
+        try {
+            const prodDoc = await db.collection('products').doc(ref).get();
+            if (!prodDoc.exists) {
+                return `<div>[Produto inválido]</div>`;
+            }
             const prod = prodDoc.data();
             return `
-              <div class="d-flex align-items-center mb-2">
-                <img src="${prod.imagem}" class="img-thumbnail me-2" style="height: 60px;">
-                <div>
-                  <div><strong>${prod.produto}</strong></div>
-                  <small>${prod.descricao || ''}</small>
+                <div class="d-flex align-items-center mb-2">
+                    <img src="${prod.imagem}" class="img-thumbnail me-2" style="height: 60px;">
+                    <div>
+                        <strong>${prod.produto}</strong>
+                        <small>${prod.descricao || ''}</small>
+                    </div>
                 </div>
-              </div>
             `;
-          })
-        );
-      
-        modalTitle.textContent = `Romaneio da Ordem ${orderId}`;
-        modalBody.innerHTML = `
-          <div>
+        } catch {
+            return `<div>[Erro ao carregar produto]</div>`;
+        }
+    }));
+
+    modalTitle.textContent = `Romaneio da Ordem ${orderId}`;
+    modalBody.innerHTML = `
+        <div>
             <h5>Cliente</h5>
-            <p><strong>Nome:</strong> ${cliente['nome-completo'] || '[sem nome]'}</p>
-            <p><strong>Email:</strong> ${cliente.email || '[sem email]'}</p>
-      
+            <p><strong>Nome:</strong> ${cliente['nome-completo']}</p>
+            <p><strong>Email:</strong> ${cliente.email}</p>
+
             <h5>Endereço</h5>
             <p>${order.endereco?.rua}, ${order.endereco?.numero} - ${order.endereco?.bairro}</p>
             <p>${order.endereco?.cidade} / ${order.endereco?.estado} - CEP: ${order.endereco?.cep}</p>
-      
+
             <h5>Itens</h5>
             ${itemsHTML.join('')}
-      
+
             <h5>Pagamento</h5>
             <p><strong>Método:</strong> ${order.metodoPagamento}</p>
             <p><strong>Status:</strong> ${order.status}</p>
             <p><strong>Total:</strong> R$ ${order.total.toFixed(2).replace('.', ',')}</p>
-          </div>
-        `;
-      
-        crudModal.show();
-    };
+        </div>
+    `;
+
+    crudModal.show();
+};
       
       
     
