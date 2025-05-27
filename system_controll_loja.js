@@ -13,7 +13,7 @@ const firebaseConfig = {
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const storage = firebase.storage();
-  storage.ref().bucket = 'cayosulivamprojetos.appspot.com';
+  const auth = firebase.auth();
   
   // Instâncias de modal
   const crudModal = new bootstrap.Modal(document.getElementById('crudModal'));
