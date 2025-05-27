@@ -672,7 +672,7 @@ const firebaseConfig = {
           ${config.fields.map(field => `
             <div class="mb-3">
               <label for="${field.name}" class="form-label">${field.label}</label>
-              ${generateFormField(field, itemData[field.name])}
+              ${generateFormField(field, itemData[field.name],action)}
             </div>
           `).join('')}
         </form>
@@ -877,7 +877,7 @@ const firebaseConfig = {
     };
           
     
-    function generateFormField(field, value = '') {
+    function generateFormField(field, value = '', acction) {
       switch(field.type) {
         case 'file':
           return `
@@ -885,12 +885,14 @@ const firebaseConfig = {
             ${value ? `<img src="${value}" class="img-thumbnail mt-2" style="max-height: 100px;">` : ''}
           `;
         case 'reference':
-          return `
-            <select class="form-select" id="${field.name}" ${field.required ? 'required' : ''}>
-              <option value="">Selecione...</option>
-              <!-- Opções serão preenchidas via JavaScript -->
-            </select>
-          `;
+            if (acction === 'add'){
+                return `
+                <select class="form-select" id="${field.name}" ${field.required ? 'required' : ''}>
+                  <option value="">Selecione...</option>
+                  <!-- Opções serão preenchidas via JavaScript -->
+                </select>
+              `;
+            }
         case 'array':
           return `
             <div id="${field.name}_container">
