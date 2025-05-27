@@ -714,87 +714,78 @@ window.showRomaneio = async (orderId) => {
       
       // Configurar botão de salvar
       modalSaveBtn.onclick = async () => {
-        const formData = {};
-        const base64Promises = [];
-        const configFields = config.fields;
-      
-        for (const field of configFields) {
-          const element = document.getElementById(field.name);
-      
-          if (field.type === 'file') {
-            if (element.files.length > 0) {
-              const file = element.files[0];
-              const reader = new FileReader();
-      
-              const promise = new Promise((resolve) => {
-                reader.onloadend = () => {
-                  formData[field.name] = reader.result; // base64 string
-                  resolve();
-                };
-              });
-      
-              reader.readAsDataURL(file);
-              base64Promises.push(promise);
-            } else if (action === 'edit' && itemData[field.name]) {
-              formData[field.name] = itemData[field.name];
-            }
-          } else if (field.type === 'checkbox') {
-            formData[field.name] = element.checked;
-          } else if (field.type === 'map') {
-            const mapData = {};
-            field.subfields.forEach(sub => {
-              mapData[sub.name] = document.getElementById(`${field.name}_${sub.name}`).value;
-            });
-            formData[field.name] = mapData;
-          } else if (field.type === 'array') {
-            const items = [];
-            const itemElements = document.querySelectorAll(`#${field.name}_items select`);
-            itemElements.forEach(el => items.push(el.value));
-            formData[field.name] = items;
-          } else {
-            formData[field.name] = element.value;
-          }
-        }
-      
-        try {
-          await Promise.all(base64Promises); // Aguarda leitura de imagens
-      
-          // Timestamps
-          if (action === 'add') {
-            formData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          }
-          formData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-      
-          if (action === 'add') {
-            await db.collection(collection).add(formData);
-            showToast(`${config.singular} criado com sucesso!`, 'success');
-          } else {
-            await db.collection(collection).doc(itemId).update(formData);
-            showToast(`${config.singular} atualizado com sucesso!`, 'success');
-          }
-      
-          crudModal.hide();
-          await loadPage(collection);
-      
-        } catch (error) {
-          console.error('Erro ao salvar:', error);
-          showToast(`Erro: ${error.message}`, 'danger');
-        }
-      };
-    
-      // Mostrar referências para campos do tipo reference
-      await populateReferenceSelects(collection, config, itemData);
+  const formData = {};
+  const base64Promises = [];
+  const configFields = config.fields;
 
-      
-      // Mostrar itens existentes para arrays
-      if (itemData.itens) {
-        for (const itemId of itemData.itens) {
-          await addArrayItem('itens', 'products', itemId);
-        }
+  for (const field of configFields) {
+    const element = document.getElementById(field.name);
+    if (!element && field.type !== 'map' && field.type !== 'array') continue;
+
+    if (field.type === 'file') {
+      if (element && element.files.length > 0) {
+        const file = element.files[0];
+        const reader = new FileReader();
+
+        const promise = new Promise((resolve) => {
+          reader.onloadend = () => {
+            formData[field.name] = reader.result; // base64 string
+            resolve();
+          };
+        });
+
+        reader.readAsDataURL(file);
+        base64Promises.push(promise);
+      } else if (action === 'edit' && itemData[field.name]) {
+        formData[field.name] = itemData[field.name];
       }
-    
-      crudModal.show();
-    };
+    } else if (field.type === 'checkbox' && element) {
+      formData[field.name] = element.checked;
+    } else if (field.type === 'map') {
+      const mapData = {};
+      field.subfields.forEach(sub => {
+        const subEl = document.getElementById(`${field.name}_${sub.name}`);
+        if (subEl) {
+          mapData[sub.name] = subEl.type === 'checkbox' ? subEl.checked : subEl.value;
+        }
+      });
+      formData[field.name] = mapData;
+    } else if (field.type === 'array') {
+      const items = [];
+      const itemElements = document.querySelectorAll(`#${field.name}_items select`);
+      itemElements.forEach(el => items.push(el.value));
+      formData[field.name] = items;
+    } else if (element) {
+      formData[field.name] = element.value;
+    }
+  }
+
+  try {
+    await Promise.all(base64Promises); // Aguarda leitura de imagens
+
+    // Timestamps
+    if (action === 'add') {
+      formData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    }
+    formData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+
+    if (action === 'add') {
+      await db.collection(collection).add(formData);
+      showToast(`${config.singular} criado com sucesso!`, 'success');
+    } else {
+      await db.collection(collection).doc(itemId).update(formData);
+      showToast(`${config.singular} atualizado com sucesso!`, 'success');
+    }
+
+    crudModal.hide();
+    await loadPage(collection);
+
+  } catch (error) {
+    console.error('Erro ao salvar:', error);
+    showToast(`Erro: ${error.message}`, 'danger');
+  }
+};
+
     
     
     // Funções auxiliares
