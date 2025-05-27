@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Firebase</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./system_controll_loja.css" />
+  
+
+</head>
+<body>
+  <!-- Login Page -->
+  <div id="login-page" class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h4><i class="fas fa-lock"></i> Acesso Restrito</h4>
+      </div>
+      <div class="login-body">
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" placeholder="Digite seu email">
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Senha</label>
+          <input type="password" class="form-control" id="password" placeholder="Digite sua senha">
+        </div>
+        <button class="btn btn-primary btn-login" id="loginBtn">
+          <i class="fas fa-sign-in-alt"></i> Entrar
+        </button>
+        <div id="login-error" class="text-danger mt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="#" class="sidebar-brand">
+        <i class="fas fa-fire"></i> Admin Dashboard
+      </a>
+      <div class="sidebar-divider"></div>
+      <div id="sidebar-menu" class="nav flex-column">
+        <!-- Menu items will be added dynamically -->
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Topbar -->
+      <div class="topbar mb-4">
+        <button class="btn btn-sm d-md-none sidebar-toggler" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="d-flex align-items-center">
+          <span id="welcome-message">Bem-vindo, </span>
+          <button class="btn btn-sm btn-outline-danger ms-3" id="logout">
+            <i class="fas fa-sign-out-alt"></i> Sair
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Content -->
+      <div id="page-content">
+        <h2 class="page-title" id="page-title">Dashboard</h2>
+        <div id="dynamic-content">
+          <!-- Content will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for CRUD operations -->
+  <div class="modal fade" id="crudModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <!-- Modal content will be loaded here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary" id="modalSaveBtn">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userModalTitle">Adicionar Usuário</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="userModalBody">
+          <form id="userForm">
+            <div class="mb-3">
+              <label for="userName" class="form-label">Nome Completo</label>
+              <input type="text" class="form-control" id="userName" required>
+            </div>
+            <div class="mb-3">
+              <label for="userEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="userEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="userPassword" class="form-label">Senha</label>
+              <input type="password" class="form-control" id="userPassword" required>
+            </div>
+            <div class="mb-3">
+              <label for="userPosition" class="form-label">Cargo</label>
+              <select class="form-select" id="userPosition" required>
+                <option value="admin">Administrador</option>
+                <option value="manager">Gerente</option>
+                <option value="employee" selected>Funcionário</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="userStatus" class="form-label">Status</label>
+              <select class="form-select" id="userStatus" required>
+                <option value="active" selected>Ativo</option>
+                <option value="inactive">Inativo</option>
+              </select>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="userIsAdmin">
+              <label class="form-check-label" for="userIsAdmin">Acesso Administrativo</label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="userModalSaveBtn">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userModalTitle">Adicionar Usuário</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="userModalBody">
+          <form id="userForm">
+            <div class="mb-3">
+              <label for="userName" class="form-label">Nome Completo</label>
+              <input type="text" class="form-control" id="userName" required>
+            </div>
+            <div class="mb-3">
+              <label for="userEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="userEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="userPassword" class="form-label">Senha</label>
+              <input type="password" class="form-control" id="userPassword" required>
+            </div>
+            <div class="mb-3">
+              <label for="userPosition" class="form-label">Cargo</label>
+              <select class="form-select" id="userPosition" required>
+                <option value="admin">Administrador</option>
+                <option value="manager">Gerente</option>
+                <option value="employee" selected>Funcionário</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="userStatus" class="form-label">Status</label>
+              <select class="form-select" id="userStatus" required>
+                <option value="active" selected>Ativo</option>
+                <option value="inactive">Inativo</option>
+              </select>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="userIsAdmin">
+              <label class="form-check-label" for="userIsAdmin">Acesso Administrativo</label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="userModalSaveBtn">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="./system_controll_loja.js"></script>
+ 
+</body> 
+</html>
