@@ -245,7 +245,7 @@ function buildSidebarMenu() {
   dashboardLink.innerHTML = '<i class="fas fa-fw fa-tachometer-alt"></i><span>Dashboard</span>';
   dashboardLink.onclick = () => {
     loadPage('dashboard');
-    fecharSidebar(); // Fechar sidebar ao clicar
+    fecharSidebar2(); // Fechar sidebar ao clicar
   };
   sidebarMenu.appendChild(dashboardLink);
   
@@ -1004,6 +1004,9 @@ function buildSidebarMenu() {
     };
     window.fecharSidebar = () => {
         document.querySelector('.sidebar').classList.remove('show');
+    };
+    window.fecharSidebar2 = () => {
+        document.querySelector('#cart-sidebar').classList.remove('show');
     };
       
     
