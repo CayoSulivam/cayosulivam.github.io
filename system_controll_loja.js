@@ -234,42 +234,49 @@ const firebaseConfig = {
     }
     
     // Construir menu lateral baseado nas permissões
-    function buildSidebarMenu() {
-      const sidebarMenu = document.getElementById('sidebar-menu');
-      sidebarMenu.innerHTML = '';
+function buildSidebarMenu() {
+  const sidebarMenu = document.getElementById('sidebar-menu');
+  sidebarMenu.innerHTML = '';
+  
+  // Adicionar dashboard
+  const dashboardLink = document.createElement('a');
+  dashboardLink.className = 'nav-link';
+  dashboardLink.href = '#';
+  dashboardLink.innerHTML = '<i class="fas fa-fw fa-tachometer-alt"></i><span>Dashboard</span>';
+  dashboardLink.onclick = () => {
+    loadPage('dashboard');
+    fecharSidebar(); // Fechar sidebar ao clicar
+  };
+  sidebarMenu.appendChild(dashboardLink);
+  
+  // Verificar se é Developer (acesso completo)
+  const isDeveloper = currentUser.position?.Developer === true;
+  
+  // Adicionar módulos baseados nas permissões
+  Object.entries(collectionsConfig).forEach(([collection, config]) => {
+    // Se for Developer ou se a permissão estiver ativa para o módulo
+    if (isDeveloper || currentUser.pages?.[collection] === true) {
+      const link = document.createElement('a');
+      link.className = 'nav-link';
+      link.href = '#';
       
-      // Adicionar dashboard
-      const dashboardLink = document.createElement('a');
-      dashboardLink.className = 'nav-link';
-      dashboardLink.href = '#';
-      dashboardLink.innerHTML = '<i class="fas fa-fw fa-tachometer-alt"></i><span>Dashboard</span>';
-      dashboardLink.onclick = () => loadPage('dashboard');
-      sidebarMenu.appendChild(dashboardLink);
+      // Definir ícone baseado no tipo
+      let iconClass = 'fas fa-fw fa-file';
+      if (collection === 'products') iconClass = 'fas fa-fw fa-box-open';
+      else if (collection === 'employees') iconClass = 'fas fa-fw fa-users';
+      else if (collection === 'order') iconClass = 'fas fa-fw fa-shopping-cart';
+      else if (collection === 'clientes') iconClass = 'fas fa-fw fa-address-book';
       
-      // Verificar se é Developer (acesso completo)
-      const isDeveloper = currentUser.position?.Developer === true;
-      
-      // Adicionar módulos baseados nas permissões
-      Object.entries(collectionsConfig).forEach(([collection, config]) => {
-        // Se for Developer ou se a permissão estiver ativa para o módulo
-        if (isDeveloper || currentUser.pages?.[collection] === true) {
-          const link = document.createElement('a');
-          link.className = 'nav-link';
-          link.href = '#';
-          
-          // Definir ícone baseado no tipo
-          let iconClass = 'fas fa-fw fa-file';
-          if (collection === 'products') iconClass = 'fas fa-fw fa-box-open';
-          else if (collection === 'employees') iconClass = 'fas fa-fw fa-users';
-          else if (collection === 'order') iconClass = 'fas fa-fw fa-shopping-cart';
-          else if (collection === 'clientes') iconClass = 'fas fa-fw fa-address-book';
-          
-          link.innerHTML = `<i class="${iconClass}" onClick="${fecharSidebar}"></i><span>${config.name}</span>`;
-          link.onclick = () => loadPage(collection);
-          sidebarMenu.appendChild(link);
-        }
-      });
+      link.innerHTML = `<i class="${iconClass}"></i><span>${config.name}</span>`;
+      link.onclick = () => {
+        loadPage(collection);
+        fecharSidebar(); // Fechar sidebar ao clicar
+      };
+      sidebarMenu.appendChild(link);
     }
+  });
+}
+
     // Adicionar esta função para atualizar o item ativo no menu
       function updateActiveMenuItem(page) {
           const menuItems = document.querySelectorAll('#sidebar-menu .nav-link');
