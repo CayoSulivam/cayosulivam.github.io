@@ -715,4 +715,58 @@ async function loadProducts() {
   
   
   document.addEventListener('DOMContentLoaded', init);
+  async function searchProducts(query, filters = {}) {
+  let queryRef = db.collection('products')
+    .where('ativo', '==', true);
   
+  // Filtro por texto
+  if (query) {
+    queryRef = queryRef.where('keywords', 'array-contains', query.toLowerCase());
+  }
+  
+  // Filtros adicionais
+  if (filters.category) {
+    queryRef = queryRef.where('categoria', '==', filters.category);
+  }
+  
+  if (filters.minPrice || filters.maxPrice) {
+    if (filters.minPrice) {
+      queryRef = queryRef.where('valor', '>=', Number(filters.minPrice));
+    }
+    if (filters.maxPrice) {
+      queryRef = queryRef.where('valor', '<=', Number(filters.maxPrice));
+    }
+  }
+  
+  const snapshot = await queryRef.get();
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+function saveCartToLocalStorage() {
+  localStorage.setItem('cart', JSON.stringify(state.cart));
+}
+
+function loadCartFromLocalStorage() {
+  const savedCart = localStorage.getItem('cart');
+  if (savedCart) {
+    state.cart = JSON.parse(savedCart);
+    updateCartUI();
+  }
+}
+
+// Chamar no carregamento da página
+document.addEventListener('DOMContentLoaded', () => {
+  loadCartFromLocalStorage();
+});
+// Ao enviar o formulário de busca
+document.getElementById('search-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const query = document.getElementById('search-input').value;
+  const filters = {
+    category: document.getElementById('category-filter').value,
+    minPrice: document.getElementById('min-price').value,
+    maxPrice: document.getElementById('max-price').value
+  };
+  
+  const products = await searchProducts(query, filters);
+  displayProducts(products); // Sua função para exibir os produtos
+});
